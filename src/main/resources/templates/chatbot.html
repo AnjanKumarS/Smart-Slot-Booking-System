@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant | Smart Slot Booking System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --chat-user: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --chat-bot: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-gradient);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+
+        /* Page Header */
+        .page-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 3rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .page-header .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .page-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        /* Chat Container */
+        .chat-container {
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: none;
+            overflow: hidden;
+            position: relative;
+            height: 700px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--primary-gradient);
+        }
+
+        /* Chat Header */
+        .chat-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .bot-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .bot-info h5 {
+            margin: 0;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .bot-info small {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            background: #28a745;
+            border-radius: 50%;
+            margin-left: auto;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* Chat Messages */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        }
+
+        .message {
+            margin-bottom: 1.5rem;
+            display: flex;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 1rem 1.5rem;
+            border-radius: 20px;
+            word-wrap: break-word;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.user .message-content {
+            background: var(--chat-user);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.bot .message-content {
+            background: var(--chat-bot);
+            color: #333;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 0.5rem;
+            text-align: right;
+        }
+
+        .message.user .message-time {
+            text-align: right;
+        }
+
+        .message.bot .message-time {
+            text-align: left;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #e9ecef;
+            background: white;
+        }
+
+        .quick-action-btn {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            font-size: 0.9rem;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .quick-action-btn:hover {
+            background: var(--primary-gradient);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Chat Input */
+        .chat-input {
+            padding: 1.5rem 2rem;
+            background: white;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            padding: 1rem 1.5rem;
+            padding-right: 70px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            background: white;
+        }
+
+        .send-btn {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: none;
+            padding: 1rem 1.5rem;
+            background: var(--chat-bot);
+            border-radius: 20px;
+            border-bottom-left-radius: 5px;
+            margin-bottom: 1.5rem;
+            max-width: 70%;
+            border: 1px solid #e9ecef;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #666;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes typing {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Welcome Message */
+        .welcome-message {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .welcome-icon {
+            font-size: 3rem;
+            color: #ddd;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .welcome-text {
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .chat-container {
+                height: 600px;
+                margin: 1rem;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .chat-header,
+            .chat-input {
+                padding: 1rem;
+            }
+
+            .chat-messages {
+                padding: 1rem;
+            }
+        }
+
+        /* Animation Classes */
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in-right {
+            animation: slideInRight 0.6s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .bounce-in {
+            animation: bounceIn 0.8s ease-out;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+
+            70% {
+                transform: scale(0.9);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="page-title animate__animated animate__fadeInLeft">
+                        AI Assistant 🤖
+                    </h1>
+                    <p class="lead mb-0 animate__animated animate__fadeInLeft animate__delay-1s">
+                        Get instant help with booking venues and managing your account
+                    </p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <a href="/dashboard" class="back-btn animate__animated animate__fadeInRight">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="chat-container animate__animated animate__fadeInUp">
+                        <!-- Chat Header -->
+                        <div class="chat-header">
+                            <div class="bot-avatar">
+                                <i class="bi bi-robot"></i>
+                            </div>
+                            <div class="bot-info">
+                                <h5>Smart Slot Assistant</h5>
+                                <small>Online • Ready to help</small>
+                            </div>
+                            <div class="status-indicator"></div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="quick-actions">
+                            <div class="text-center">
+                                <span class="text-muted small mb-2 d-block">Quick Actions:</span>
+                                <a href="#" class="quick-action-btn"
+                                    onclick="sendQuickMessage('What venues are available?')">
+                                    <i class="bi bi-building me-1"></i>Available Venues
+                                </a>
+                                <a href="#" class="quick-action-btn" onclick="sendQuickMessage('Show me my bookings')">
+                                    <i class="bi bi-calendar-check me-1"></i>My Bookings
+                                </a>
+                                <a href="#" class="quick-action-btn"
+                                    onclick="sendQuickMessage('How do I book a venue?')">
+                                    <i class="bi bi-plus-circle me-1"></i>Book Venue
+                                </a>
+                                <a href="#" class="quick-action-btn"
+                                    onclick="sendQuickMessage('What is my booking status?')">
+                                    <i class="bi bi-clock-history me-1"></i>Booking Status
+                                </a>
+                                <a href="#" class="quick-action-btn" onclick="sendQuickMessage('Help me')">
+                                    <i class="bi bi-question-circle me-1"></i>Help
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Chat Messages -->
+                        <div class="chat-messages" id="chat-messages">
+                            <!-- Welcome Message -->
+                            <div class="welcome-message">
+                                <div class="welcome-icon">
+                                    <i class="bi bi-robot"></i>
+                                </div>
+                                <div class="welcome-title">Welcome to Smart Slot Assistant!</div>
+                                <div class="welcome-text">
+                                    I'm here to help you with venue bookings, account management, and any questions you
+                                    might have.
+                                    Feel free to ask me anything!
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Typing Indicator -->
+                        <div class="typing-indicator" id="typing-indicator">
+                            <div class="d-flex align-items-center">
+                                <div class="bot-avatar me-2" style="width: 30px; height: 30px; font-size: 1rem;">
+                                    <i class="bi bi-robot"></i>
+                                </div>
+                                <div class="typing-dots">
+                                    <div class="typing-dot"></div>
+                                    <div class="typing-dot"></div>
+                                    <div class="typing-dot"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chat Input -->
+                        <div class="chat-input">
+                            <form id="chat-form">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="message-input"
+                                        placeholder="Type your message here..." autocomplete="off">
+                                    <button class="send-btn" type="submit" id="send-btn">
+                                        <i class="bi bi-send"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script src="/js/chatbot.js"></script>
+
+    <script>
+        // Enhanced chatbot functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            const chatForm = document.getElementById('chat-form');
+            const messageInput = document.getElementById('message-input');
+            const sendBtn = document.getElementById('send-btn');
+            const chatMessages = document.getElementById('chat-messages');
+            const typingIndicator = document.getElementById('typing-indicator');
+
+            // Auto-resize textarea
+            messageInput.addEventListener('input', function () {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+
+            // Handle form submission
+            chatForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const message = messageInput.value.trim();
+                if (message) {
+                    sendMessage(message);
+                    messageInput.value = '';
+                    messageInput.style.height = 'auto';
+                }
+            });
+
+            // Handle Enter key
+            messageInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    chatForm.dispatchEvent(new Event('submit'));
+                }
+            });
+
+            // Send message function
+            function sendMessage(message) {
+                // Add user message
+                addMessage(message, 'user');
+
+                // Show typing indicator
+                showTypingIndicator();
+
+                // Simulate bot response (replace with actual API call)
+                setTimeout(() => {
+                    hideTypingIndicator();
+                    const response = generateBotResponse(message);
+                    addMessage(response, 'bot');
+                }, 1500 + Math.random() * 1000);
+            }
+
+            // Add message to chat
+            function addMessage(text, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}`;
+
+                const time = new Date().toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        ${text}
+                        <div class="message-time">${time}</div>
+                    </div>
+                `;
+
+                chatMessages.appendChild(messageDiv);
+                scrollToBottom();
+
+                // Add animation
+                messageDiv.style.opacity = '0';
+                messageDiv.style.transform = sender === 'user' ? 'translateX(30px)' : 'translateX(-30px)';
+
+                setTimeout(() => {
+                    messageDiv.style.transition = 'all 0.3s ease';
+                    messageDiv.style.opacity = '1';
+                    messageDiv.style.transform = 'translateX(0)';
+                }, 100);
+            }
+
+            // Show typing indicator
+            function showTypingIndicator() {
+                typingIndicator.style.display = 'block';
+                scrollToBottom();
+            }
+
+            // Hide typing indicator
+            function hideTypingIndicator() {
+                typingIndicator.style.display = 'none';
+            }
+
+            // Scroll to bottom
+            function scrollToBottom() {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            // Generate bot response (replace with actual API)
+            function generateBotResponse(message) {
+                const responses = {
+                    'hello': 'Hello! How can I help you with venue booking today?',
+                    'hi': 'Hi there! I\'m here to assist you with your venue booking needs.',
+                    'help': 'I can help you with:\n• Booking venues\n• Managing your bookings\n• Checking venue availability\n• Cancelling bookings\n• Account issues\n\nWhat would you like to know?',
+                    'book': 'To book a venue:\n1. Go to "Book Venue" in the navigation\n2. Select your preferred venue\n3. Choose date and time\n4. Fill in event details\n5. Submit your booking\n\nWould you like me to guide you through any specific step?',
+                    'cancel': 'To cancel a booking:\n1. Go to "My Bookings"\n2. Find the booking you want to cancel\n3. Click the "Cancel" button\n4. Confirm the cancellation\n\nNote: You can only cancel pending bookings.',
+                    'venues': 'We have various venues available:\n• Conference Rooms (10-50 people)\n• Meeting Rooms (5-15 people)\n• Auditoriums (100+ people)\n• Training Rooms (20-30 people)\n\nCheck the dashboard for current availability!',
+                    'availability': 'To check venue availability:\n1. Visit the dashboard\n2. Browse available venues\n3. Or use the booking form to see available slots\n\nWould you like me to show you how to check specific dates?'
+                };
+
+                const lowerMessage = message.toLowerCase();
+
+                for (const [key, response] of Object.entries(responses)) {
+                    if (lowerMessage.includes(key)) {
+                        return response;
+                    }
+                }
+
+                return 'I\'m here to help! You can ask me about:\n• How to book venues\n• Managing your bookings\n• Venue availability\n• Cancelling bookings\n• Any other booking-related questions';
+            }
+
+            // Quick message function
+            window.sendQuickMessage = function (message) {
+                sendMessage(message);
+            };
+
+            // Add smooth scrolling
+            chatMessages.style.scrollBehavior = 'smooth';
+
+            // Focus on input when page loads
+            messageInput.focus();
+
+            // Add hover effects
+            sendBtn.addEventListener('mouseenter', function () {
+                this.style.transform = 'translateY(-50%) scale(1.1)';
+            });
+
+            sendBtn.addEventListener('mouseleave', function () {
+                this.style.transform = 'translateY(-50%) scale(1)';
+            });
+
+            // Add input focus effects
+            messageInput.addEventListener('focus', function () {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+
+            messageInput.addEventListener('blur', function () {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+
+</html>

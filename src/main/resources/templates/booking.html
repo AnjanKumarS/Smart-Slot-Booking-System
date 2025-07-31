@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Book a Venue | Smart Slot Booking System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #8b5cf6;
+            --accent-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Page Header */
+        .page-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2rem 0;
+            position: relative;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .page-header .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        /* Booking Container */
+        .booking-container {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .booking-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .booking-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 2.5rem 2.5rem 2rem;
+            text-align: center;
+        }
+
+        .card-header h2 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .card-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 0;
+            font-weight: 400;
+        }
+
+        .card-body {
+            padding: 2.5rem;
+        }
+
+        /* Modern Form Styling */
+        .form-group {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-label i {
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+
+        .form-control,
+        .form-select {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            color: var(--text-primary);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            width: 100%;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            outline: none;
+            transform: translateY(-1px);
+        }
+
+        .form-control:hover,
+        .form-select:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        /* Modern Input Groups */
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group .form-control {
+            padding-left: 3rem;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            color: var(--primary-color);
+            font-size: 1.125rem;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* Floating Labels */
+        .floating-label {
+            position: relative;
+        }
+
+        .floating-label .form-control {
+            padding-top: 1.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .floating-label .form-label {
+            position: absolute;
+            top: 1rem;
+            left: 1.25rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            pointer-events: none;
+            background: white;
+            padding: 0 0.25rem;
+        }
+
+        .floating-label .form-control:focus+.form-label,
+        .floating-label .form-control:not(:placeholder-shown)+.form-label {
+            top: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Modern Time Slots */
+        .time-slots-container {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .time-slots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .time-slot {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .time-slot:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .time-slot.selected {
+            border-color: var(--primary-color);
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .time-slot.selected .slot-time {
+            color: white;
+        }
+
+        /* Modern Submit Button */
+        .submit-btn {
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-height: 3rem;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Modern Alert Styles */
+        .alert {
+            border-radius: 12px;
+            border: none;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .card-body {
+                padding: 1.5rem;
+            }
+
+            .card-header {
+                padding: 2rem 1.5rem 1.5rem;
+            }
+
+            .time-slots-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading States */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Modern Card Hover Effects */
+        .booking-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Form Validation Styles */
+        .form-control.is-valid {
+            border-color: var(--success-color);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .form-control.is-invalid {
+            border-color: var(--danger-color);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .invalid-feedback {
+            color: var(--danger-color);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .valid-feedback {
+            color: var(--success-color);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Form Text Styling */
+        .form-text {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 400;
+        }
+
+        .form-text i {
+            color: var(--primary-color);
+            font-size: 0.875rem;
+        }
+
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* Error Messages */
+        .alert {
+            border-radius: 12px;
+            border: none;
+            padding: 1rem 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            color: white;
+        }
+
+        /* Modal Styling */
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 20px 20px 0 0;
+            border-bottom: none;
+            padding: 1.5rem 2rem;
+        }
+
+        .modal-title {
+            font-weight: 600;
+        }
+
+        .btn-close {
+            filter: invert(1);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .suggestion-item {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-item:hover {
+            border-color: #667eea;
+            background: white;
+        }
+
+        .book-suggestion-btn {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: white;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .book-suggestion-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+
+        /* Loading States */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 25px;
+            z-index: 10;
+        }
+
+        .spinner-custom {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .card-body {
+                padding: 1.5rem;
+            }
+
+            .booking-card {
+                margin: 1rem;
+            }
+        }
+
+        /* Animation Classes */
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in-right {
+            animation: slideInRight 0.6s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-12 text-center">
+                    <h1 class="page-title animate__animated animate__fadeInUp">
+                        Book Your Perfect Venue 🎯
+                    </h1>
+                    <p class="page-subtitle animate__animated animate__fadeInUp animate__delay-1s">
+                        Choose from our premium venues and secure your spot in minutes
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Form -->
+    <div class="container booking-container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
+                <div class="booking-card animate__animated animate__fadeInUp">
+                    <div class="card-header">
+                        <h2>
+                            <i class="bi bi-building"></i>
+                            Venue Booking
+                        </h2>
+                        <p>Fill in the details below to reserve your venue</p>
+                    </div>
+                    <div class="card-body">
+                        <form id="bookingForm">
+                            <div class="form-group">
+                                <label for="venue" class="form-label">
+                                    <i class="bi bi-building"></i>
+                                    Select Venue
+                                </label>
+                                <div class="input-group">
+                                    <i class="bi bi-building input-icon"></i>
+                                    <select class="form-select" id="venue" name="venue" required>
+                                        <option value="">Choose your preferred venue...</option>
+                                        <option th:each="venue : ${venues}" th:value="${venue.id}"
+                                            th:text="${venue.name + ' (Capacity: ' + venue.capacity + ' people)'}"
+                                            th:selected="${venue.id == selectedVenueId}">
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="date" class="form-label">
+                                    <i class="bi bi-calendar-event"></i>
+                                    Event Date
+                                </label>
+                                <div class="input-group">
+                                    <i class="bi bi-calendar-event input-icon"></i>
+                                    <input type="date" class="form-control" id="date" name="date" required>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="start-time" class="form-label">
+                                            <i class="bi bi-clock"></i>
+                                            Start Time
+                                        </label>
+                                        <div class="input-group">
+                                            <i class="bi bi-clock input-icon"></i>
+                                            <input type="time" class="form-control" id="start-time" name="start-time"
+                                                required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="end-time" class="form-label">
+                                            <i class="bi bi-clock-fill"></i>
+                                            End Time
+                                        </label>
+                                        <div class="input-group">
+                                            <i class="bi bi-clock-fill input-icon"></i>
+                                            <input type="time" class="form-control" id="end-time" name="end-time"
+                                                required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Available Slots Display -->
+                            <div class="form-group" id="available-slots-container" style="display: none;">
+                                <label class="form-label">
+                                    <i class="bi bi-list-check"></i>
+                                    Available Time Slots
+                                </label>
+                                <div class="time-slots-container">
+                                    <div id="available-slots" class="time-slots-grid">
+                                        <!-- Available slots will be loaded here -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="title" class="form-label">
+                                    <i class="bi bi-pencil"></i>
+                                    Event Title
+                                </label>
+                                <div class="input-group">
+                                    <i class="bi bi-pencil input-icon"></i>
+                                    <input type="text" class="form-control" id="title" name="title"
+                                        placeholder="e.g., Team Meeting, Workshop, Conference, Seminar..." required>
+                                </div>
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Choose a descriptive title for your event
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="purpose" class="form-label">
+                                    <i class="bi bi-chat-text"></i>
+                                    Event Purpose & Details
+                                </label>
+                                <div class="input-group">
+                                    <i class="bi bi-chat-text input-icon"></i>
+                                    <textarea class="form-control" id="purpose" name="purpose" rows="4"
+                                        placeholder="Describe the purpose, agenda, and any special requirements for your event..."></textarea>
+                                </div>
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Provide details to help us better accommodate your needs
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="submit-btn" id="submitBtn">
+                                    <i class="bi bi-check-circle"></i>
+                                    <span>Book Now</span>
+                                </button>
+                            </div>
+                            
+                            <div class="text-center mt-3">
+                                <small class="text-muted">
+                                    <i class="bi bi-shield-check me-1"></i>
+                                    Your booking will be secured after OTP verification
+                                </small>
+                            </div>
+                        </form>
+
+                        <div id="bookingError" class="alert alert-danger d-none" role="alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <span id="errorMessage"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slot Conflict Modal -->
+    <div class="modal fade" id="conflictModal" tabindex="-1" aria-labelledby="conflictModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="conflictModalLabel">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Slot Unavailable
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3">The selected time slot is already booked. Here are some alternative options:</p>
+                    <div id="suggestionList">
+                        <!-- Suggestions will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-auto bg-dark text-white text-center py-4 w-100">
+        <div class="container">
+            <p class="mb-0">© 2025 SmartSlot Booking System | Making venue booking simple and efficient</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Enhanced booking form functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            const venueSelect = document.getElementById('venue');
+            const bookingForm = document.getElementById('bookingForm');
+            const errorDiv = document.getElementById('bookingError');
+            const errorMessage = document.getElementById('errorMessage');
+
+            // Load venues dynamically if not loaded by Thymeleaf
+            if (venueSelect.options.length <= 1) {
+                loadVenuesDynamically();
+            }
+
+            // Add form validation and enhanced UX
+            bookingForm.addEventListener('submit', handleBookingSubmit);
+
+            // Add real-time validation
+            addFormValidation();
+
+            // Add loading states
+            addLoadingStates();
+        });
+
+        async function loadVenuesDynamically() {
+            try {
+                const response = await fetch('/api/venues');
+                const data = await response.json();
+
+                if (data.success && data.venues) {
+                    const venueSelect = document.getElementById('venue');
+                    venueSelect.innerHTML = '<option value="">Choose your preferred venue...</option>';
+
+                    data.venues.forEach(venue => {
+                        const option = document.createElement('option');
+                        option.value = venue.id;
+                        option.textContent = `${venue.name} (Capacity: ${venue.capacity} people)`;
+                        venueSelect.appendChild(option);
+                    });
+                } else {
+                    showError('Failed to load venues: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                showError('Error loading venues: ' + error.message);
+            }
+        }
+
+        function handleBookingSubmit(e) {
+            e.preventDefault();
+
+            const formData = {
+                venueId: document.getElementById('venue').value,
+                date: document.getElementById('date').value,
+                startTime: document.getElementById('start-time').value,
+                endTime: document.getElementById('end-time').value,
+                title: document.getElementById('title').value,
+                purpose: document.getElementById('purpose').value
+            };
+
+            // Validation
+            if (!validateForm(formData)) {
+                return;
+            }
+
+            // Show loading state
+            showLoading(true);
+
+            // Submit booking
+            submitBooking(formData);
+        }
+
+        function validateForm(data) {
+            const errorDiv = document.getElementById('bookingError');
+            const errorMessage = document.getElementById('errorMessage');
+
+            if (!data.venueId || !data.date || !data.startTime || !data.endTime || !data.title) {
+                showError('Please fill in all required fields');
+                return false;
+            }
+
+            if (data.startTime >= data.endTime) {
+                showError('End time must be after start time');
+                return false;
+            }
+
+            const selectedDate = new Date(data.date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (selectedDate < today) {
+                showError('Cannot book for past dates');
+                return false;
+            }
+
+            return true;
+        }
+
+        async function submitBooking(formData) {
+            try {
+                const response = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.redirectUrl) {
+                    showSuccess('Booking submitted successfully! Redirecting...');
+                    setTimeout(() => {
+                        window.location.href = data.redirectUrl;
+                    }, 1500);
+                } else if (data.error && data.error.toLowerCase().includes('conflict')) {
+                    // Fetch alternates
+                    const altResp = await fetch(`/api/bookings/suggest-alternates?venueId=${formData.venueId}&date=${formData.date}&startTime=${formData.startTime}&endTime=${formData.endTime}`);
+                    const altData = await altResp.json();
+                    showConflictModal(altData.suggestions || []);
+                } else {
+                    showError(data.error || 'Booking failed. Please try again.');
+                }
+            } catch (err) {
+                showError('Network error. Please check your connection and try again.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('bookingError');
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorDiv.classList.remove('d-none');
+            errorDiv.classList.add('animate__animated', 'animate__shakeX');
+
+            setTimeout(() => {
+                errorDiv.classList.remove('animate__animated', 'animate__shakeX');
+            }, 1000);
+        }
+
+        function showSuccess(message) {
+            const errorDiv = document.getElementById('bookingError');
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorDiv.classList.remove('d-none', 'alert-danger');
+            errorDiv.classList.add('alert-success');
+        }
+
+        function showLoading(show) {
+            const submitBtn = document.querySelector('.submit-btn');
+            if (show) {
+                submitBtn.innerHTML = '<div class="spinner-border spinner-border-sm me-2"></div>Processing...';
+                submitBtn.disabled = true;
+            } else {
+                submitBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Book Now';
+                submitBtn.disabled = false;
+            }
+        }
+
+        function showConflictModal(suggestions) {
+            const list = document.getElementById('suggestionList');
+            list.innerHTML = '';
+
+            if (suggestions.length === 0) {
+                list.innerHTML = '<div class="suggestion-item text-center text-muted">No alternate slots found.</div>';
+            } else {
+                suggestions.forEach(s => {
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item d-flex justify-content-between align-items-center';
+                    div.innerHTML = `
+                        <div>
+                            <strong>${s.date}</strong><br>
+                            <small class="text-muted">${s.startTime} - ${s.endTime}</small>
+                        </div>
+                        <button class="book-suggestion-btn">Book This</button>
+                    `;
+
+                    div.querySelector('.book-suggestion-btn').addEventListener('click', function () {
+                        document.getElementById('date').value = s.date;
+                        document.getElementById('start-time').value = s.startTime;
+                        document.getElementById('end-time').value = s.endTime;
+                        var modal = bootstrap.Modal.getInstance(document.getElementById('conflictModal'));
+                        modal.hide();
+                    });
+
+                    list.appendChild(div);
+                });
+            }
+
+            var modal = new bootstrap.Modal(document.getElementById('conflictModal'));
+            modal.show();
+        }
+
+        function addFormValidation() {
+            // Add real-time validation feedback
+            const inputs = document.querySelectorAll('.form-control, .form-select');
+            inputs.forEach(input => {
+                input.addEventListener('blur', function () {
+                    if (this.hasAttribute('required') && !this.value) {
+                        this.classList.add('is-invalid');
+                    } else {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                    }
+                });
+            });
+        }
+
+        function addLoadingStates() {
+            // Add smooth transitions and loading states
+            const form = document.getElementById('bookingForm');
+            form.addEventListener('submit', function () {
+                this.classList.add('loading');
+            });
+        }
+    </script>
+</body>
+
+</html>

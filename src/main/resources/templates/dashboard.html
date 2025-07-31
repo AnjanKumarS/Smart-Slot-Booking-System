@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Smart Slot Booking System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --info-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --dark-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 3rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .dashboard-header .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .welcome-text {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .user-profile {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .user-profile .fw-bold {
+            word-break: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+            font-size: 0.9rem !important;
+        }
+
+        /* Stats Cards */
+        .stats-section {
+            margin-top: -2rem;
+            position: relative;
+            z-index: 3;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+        }
+
+        .stats-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .stats-card .icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .stats-card.primary .icon {
+            background: var(--primary-gradient);
+        }
+
+        .stats-card.success .icon {
+            background: var(--success-gradient);
+        }
+
+        .stats-card.warning .icon {
+            background: var(--warning-gradient);
+        }
+
+        .stats-card.info .icon {
+            background: var(--info-gradient);
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .action-btn {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 15px;
+            padding: 1.5rem;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .action-btn i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Venues Section */
+        .venues-section {
+            background: white;
+            border-radius: 25px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .venues-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--primary-gradient);
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 2.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-title i {
+            font-size: 2rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .venues-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .venue-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s ease;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .venue-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .venue-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .venue-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(102, 126, 234, 0.15);
+        }
+
+        .venue-image {
+            height: 220px;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .venue-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+        }
+
+        .venue-image i {
+            position: relative;
+            z-index: 2;
+        }
+
+        .venue-image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(102, 126, 234, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3.5rem;
+        }
+
+        .venue-details {
+            padding: 2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .venue-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: #2c3e50;
+            line-height: 1.3;
+        }
+
+        .venue-capacity {
+            color: #6c757d;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .venue-capacity i {
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .venue-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .venue-feature {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .book-venue-btn {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-top: auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .book-venue-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .book-venue-btn:hover::before {
+            left: 100%;
+        }
+
+        .book-venue-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .venue-status {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(40, 167, 69, 0.9);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        .venue-status.available {
+            background: rgba(40, 167, 69, 0.9);
+        }
+
+        .venue-status.busy {
+            background: rgba(255, 193, 7, 0.9);
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+        }
+
+        .spinner-custom {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .welcome-text {
+                font-size: 2.5rem;
+            }
+
+            .stats-card {
+                margin-bottom: 1rem;
+            }
+
+            .action-btn {
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Animation Classes */
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .bounce-in {
+            animation: bounceIn 0.8s ease-out;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+
+            70% {
+                transform: scale(0.9);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <!-- Dashboard Header -->
+    <section class="dashboard-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="welcome-text animate__animated animate__fadeInLeft">
+                        Welcome back, <span th:text="${session.user?.name ?: session.user?.email}">User</span>! 👋
+                    </h1>
+                    <p class="lead mb-0 animate__animated animate__fadeInLeft animate__delay-1s">
+                        Ready to book your next amazing venue? Let's make it happen!
+                    </p>
+                </div>
+                <div class="col-lg-4">
+                    <div class="user-profile animate__animated animate__fadeInRight">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-white bg-opacity-20 rounded-circle p-3 me-3">
+                                <i class="bi bi-person-circle fs-1"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold fs-5" th:text="${session.user?.email}">user@example.com</div>
+                                <small class="text-light opacity-75" th:text="${session.role}">USER</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Dashboard Content -->
+    <main class="py-5">
+        <div class="container">
+            <!-- Stats Cards -->
+            <div class="row stats-section">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stats-card primary animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+                        <div class="icon">
+                            <i class="bi bi-building"></i>
+                        </div>
+                        <div class="stats-number">50+</div>
+                        <p class="text-muted mb-0">Venues Available</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stats-card success animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+                        <div class="icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <div class="stats-number">1000+</div>
+                        <p class="text-muted mb-0">Bookings Made</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stats-card warning animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+                        <div class="icon">
+                            <i class="bi bi-headset"></i>
+                        </div>
+                        <div class="stats-number">24/7</div>
+                        <p class="text-muted mb-0">Support</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stats-card info animate__animated animate__fadeInUp" style="animation-delay: 0.4s;">
+                        <div class="icon">
+                            <i class="bi bi-star"></i>
+                        </div>
+                        <div class="stats-number">4.9</div>
+                        <p class="text-muted mb-0">User Rating</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions animate__animated animate__fadeInUp" style="animation-delay: 0.5s;">
+                <h3 class="section-title mb-4">Quick Actions</h3>
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <a href="/booking" class="action-btn">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Book Venue</span>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <a href="/user/bookings" class="action-btn">
+                            <i class="bi bi-calendar-event"></i>
+                            <span>My Bookings</span>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <a href="/chatbot" class="action-btn">
+                            <i class="bi bi-robot"></i>
+                            <span>AI Assistant</span>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <a href="/dashboard" class="action-btn">
+                            <i class="bi bi-graph-up"></i>
+                            <span>Analytics</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Venues Section -->
+            <div class="venues-section animate__animated animate__fadeInUp" style="animation-delay: 0.6s;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="section-title mb-0">
+                        <i class="bi bi-building"></i>
+                        Available Venues
+                    </h2>
+                    <button id="reset-venues-btn" class="btn btn-outline-primary btn-sm" style="display: none;">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Reset Venues
+                    </button>
+                </div>
+                <div class="venues-grid" id="venues-grid">
+                    <!-- Venues will be loaded dynamically -->
+                    <div class="venue-card">
+                        <div class="venue-status available">Available</div>
+                        <div class="venue-image">
+                            <i class="bi bi-building"></i>
+                        </div>
+                        <div class="venue-details">
+                            <h3 class="venue-name">Conference Room A</h3>
+                            <p class="venue-capacity">
+                                <i class="bi bi-people"></i>
+                                Capacity: 50 people
+                            </p>
+                            <div class="venue-features">
+                                <span class="venue-feature">Projector</span>
+                                <span class="venue-feature">WiFi</span>
+                                <span class="venue-feature">AC</span>
+                            </div>
+                            <a href="/booking" class="book-venue-btn">
+                                <i class="bi bi-calendar-plus"></i>
+                                Book Now
+                            </a>
+                        </div>
+                    </div>
+                    <div class="venue-card">
+                        <div class="venue-status available">Available</div>
+                        <div class="venue-image">
+                            <i class="bi bi-building"></i>
+                        </div>
+                        <div class="venue-details">
+                            <h3 class="venue-name">Auditorium</h3>
+                            <p class="venue-capacity">
+                                <i class="bi bi-people"></i>
+                                Capacity: 200 people
+                            </p>
+                            <div class="venue-features">
+                                <span class="venue-feature">Stage</span>
+                                <span class="venue-feature">Sound System</span>
+                                <span class="venue-feature">Lighting</span>
+                            </div>
+                            <a href="/booking" class="book-venue-btn">
+                                <i class="bi bi-calendar-plus"></i>
+                                Book Now
+                            </a>
+                        </div>
+                    </div>
+                    <div class="venue-card">
+                        <div class="venue-status available">Available</div>
+                        <div class="venue-image">
+                            <i class="bi bi-building"></i>
+                        </div>
+                        <div class="venue-details">
+                            <h3 class="venue-name">Meeting Room B</h3>
+                            <p class="venue-capacity">
+                                <i class="bi bi-people"></i>
+                                Capacity: 20 people
+                            </p>
+                            <div class="venue-features">
+                                <span class="venue-feature">Whiteboard</span>
+                                <span class="venue-feature">WiFi</span>
+                                <span class="venue-feature">Coffee</span>
+                            </div>
+                            <a href="/booking" class="book-venue-btn">
+                                <i class="bi bi-calendar-plus"></i>
+                                Book Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script src="/js/dashboard.js"></script>
+
+    <script>
+        // Add smooth scrolling and enhanced animations
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add intersection observer for scroll animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function (entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all cards for animation
+            document.querySelectorAll('.stats-card, .venue-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'all 0.6s ease-out';
+                observer.observe(card);
+            });
+
+            // Add hover effects for interactive elements
+            document.querySelectorAll('.action-btn, .book-venue-btn').forEach(btn => {
+                btn.addEventListener('mouseenter', function () {
+                    this.style.transform = 'translateY(-5px) scale(1.02)';
+                });
+
+                btn.addEventListener('mouseleave', function () {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Verify Booking OTP</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <div th:replace="fragments/navbar :: navbar"></div>
+    <div class="container my-5 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h2 class="mb-4 text-center">Verify OTP</h2>
+
+                        <!-- Development OTP Display -->
+                        <div id="devOtpDisplay" class="alert alert-info mb-3" style="display: none;">
+                            <h6><i class="fas fa-info-circle me-2"></i>Development Mode</h6>
+                            <p class="mb-2">Your OTP is: <strong id="otpDisplay"></strong></p>
+                            <small class="text-muted">In production, this would be sent to your email.</small>
+                        </div>
+
+                        <form id="otpForm">
+                            <div class="mb-3">
+                                <label for="otp" class="form-label">Enter OTP</label>
+                                <input type="text" class="form-control" id="otp" maxlength="6" required autofocus
+                                    placeholder="Enter 6-digit OTP">
+                                <div class="form-text">Enter the 6-digit OTP sent to your email</div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-check me-2"></i>Verify OTP
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="resendOtp()">
+                                    <i class="fas fa-redo me-2"></i>Resend OTP
+                                </button>
+                            </div>
+                        </form>
+
+                        <div id="otpSuccess" class="alert alert-success d-none mt-3" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <span id="successMessage"></span>
+                        </div>
+                        <div id="otpError" class="alert alert-danger d-none mt-3" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <span id="errorMessage"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="mt-auto bg-dark text-white text-center py-3 w-100">
+        © 2025 SmartSlot Booking System
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+    <script>
+        // Check if OTP is available in session (for development)
+        window.addEventListener('DOMContentLoaded', function () {
+            checkOtpAvailability();
+        });
+
+        async function checkOtpAvailability() {
+            try {
+                const response = await fetch('/api/bookings/get-otp');
+                const data = await response.json();
+                if (data.success && data.otp) {
+                    document.getElementById('devOtpDisplay').style.display = 'block';
+                    document.getElementById('otpDisplay').textContent = data.otp;
+                }
+            } catch (error) {
+                console.log('OTP not available in session');
+            }
+        }
+
+        async function resendOtp() {
+            try {
+                const response = await fetch('/api/bookings/resend-otp', { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('devOtpDisplay').style.display = 'block';
+                    document.getElementById('otpDisplay').textContent = data.otp;
+                    showMessage('OTP resent successfully!', 'success');
+                } else {
+                    showMessage(data.error || 'Failed to resend OTP', 'error');
+                }
+            } catch (error) {
+                showMessage('Failed to resend OTP', 'error');
+            }
+        }
+
+        function showMessage(message, type) {
+            const successDiv = document.getElementById('otpSuccess');
+            const errorDiv = document.getElementById('otpError');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+
+            successDiv.classList.add('d-none');
+            errorDiv.classList.add('d-none');
+
+            if (type === 'success') {
+                successMessage.textContent = message;
+                successDiv.classList.remove('d-none');
+            } else {
+                errorMessage.textContent = message;
+                errorDiv.classList.remove('d-none');
+            }
+        }
+
+        document.getElementById('otpForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const otp = document.getElementById('otp').value;
+
+            if (!otp || otp.length !== 6) {
+                showMessage('Please enter a valid 6-digit OTP', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/bookings/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ otp })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showMessage('Booking confirmed successfully! Redirecting to dashboard...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 2000);
+                } else {
+                    showMessage(data.error || 'Invalid OTP', 'error');
+                }
+            } catch (err) {
+                showMessage('OTP verification failed. Please try again.', 'error');
+            }
+        });
+    </script>
+</body>
+
+</html>
