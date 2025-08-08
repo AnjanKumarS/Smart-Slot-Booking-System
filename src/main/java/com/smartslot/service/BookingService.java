@@ -4,18 +4,19 @@ import com.smartslot.model.Booking;
 import com.smartslot.model.User;
 import com.smartslot.model.Venue;
 import com.smartslot.repository.BookingRepository;
+import com.smartslot.repository.UserRepository;
 import com.smartslot.repository.VenueRepository;
 import com.smartslot.util.OtpUtil;
 import com.smartslot.util.EmailUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Service
 public class BookingService {
@@ -25,6 +26,9 @@ public class BookingService {
     
     @Autowired
     private VenueRepository venueRepository;
+    
+    @Autowired
+    private UserRepository userRepository;
     
     @Autowired
     private OtpUtil otpUtil;
@@ -118,12 +122,63 @@ public class BookingService {
      */
     public List<Booking> getUserBookings(Object userObj) {
         if (userObj instanceof User) {
-            return getUserBookings((User) userObj);
+            User user = (User) userObj;
+            System.out.println("BookingService: Processing user bookings for user: " + user.getEmail() + ", ID: " + user.getId());
+            
+            // Check if the user has an ID (is a proper entity)
+            if (user.getId() != null) {
+                System.out.println("BookingService: User has ID, using direct lookup");
+                return getUserBookings(user);
+            } else {
+                // User doesn't have an ID, try to find by email
+                if (user.getEmail() != null) {
+                    System.out.println("BookingService: User doesn't have ID, looking up by email: " + user.getEmail());
+                    Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+                    if (existingUser.isPresent()) {
+                        System.out.println("BookingService: Found existing user by email, ID: " + existingUser.get().getId());
+                        return getUserBookings(existingUser.get());
+                    } else {
+                        System.out.println("BookingService: No existing user found by email: " + user.getEmail());
+                        // User doesn't exist in database, return empty list
+                        return new ArrayList<>();
+                    }
+                } else {
+                    System.out.println("BookingService: User email is null");
+                    return new ArrayList<>();
+                }
+            }
         } else {
+            System.out.println("BookingService: userObj is not a User instance: " + (userObj != null ? userObj.getClass().getName() : "null"));
             // Handle case where userObj might be a different type
             // For now, return empty list
             return new ArrayList<>();
         }
+    }
+    
+    /**
+     * Get user bookings filtered by status
+     * @param userObj User object from session
+     * @param status Booking status to filter by
+     * @return List of filtered user bookings
+     */
+    public List<Booking> getUserBookingsByStatus(Object userObj, Booking.BookingStatus status) {
+        if (userObj instanceof User) {
+            User user = (User) userObj;
+            
+            // Check if the user has an ID (is a proper entity)
+            if (user.getId() != null) {
+                return bookingRepository.findByUserAndStatusOrderByCreatedAtDesc(user, status);
+            } else {
+                // User doesn't have an ID, try to find by email
+                if (user.getEmail() != null) {
+                    Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+                    if (existingUser.isPresent()) {
+                        return bookingRepository.findByUserAndStatusOrderByCreatedAtDesc(existingUser.get(), status);
+                    }
+                }
+            }
+        }
+        return new ArrayList<>();
     }
     
     /**

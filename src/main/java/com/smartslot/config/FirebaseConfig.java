@@ -21,38 +21,53 @@ public class FirebaseConfig {
     @Value("${firebase.database-url:}")
     private String databaseUrl;
 
+    @Value("${firebase.demo-mode:false}")
+    private boolean demoMode;
+
     @PostConstruct
     public void init() {
         try {
             if (FirebaseApp.getApps().isEmpty()) {
-                // Load service account from classpath (recommended approach)
-                InputStream serviceAccount = 
-                    new ClassPathResource("firebase-service-account.json").getInputStream();
+                // Try to load service account from classpath
+                try {
+                    InputStream serviceAccount = 
+                        new ClassPathResource("firebase-service-account.json").getInputStream();
 
-                FirebaseOptions.Builder optionsBuilder = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount));
+                    FirebaseOptions.Builder optionsBuilder = FirebaseOptions.builder()
+                        .setCredentials(GoogleCredentials.fromStream(serviceAccount));
 
-                // Set database URL if provided
-                if (databaseUrl != null && !databaseUrl.isEmpty()) {
-                    optionsBuilder.setDatabaseUrl(databaseUrl);
+                    // Set database URL if provided
+                    if (databaseUrl != null && !databaseUrl.isEmpty()) {
+                        optionsBuilder.setDatabaseUrl(databaseUrl);
+                    }
+
+                    FirebaseOptions options = optionsBuilder.build();
+                    FirebaseApp.initializeApp(options);
+
+                    logger.info("✅ Firebase successfully initialized");
+                    System.out.println("✅ Firebase successfully initialized");
+                } catch (IOException e) {
+                    if (demoMode) {
+                        logger.warn("🔥 Firebase initialization failed - Demo mode enabled, continuing without Firebase");
+                        System.out.println("🔥 Firebase initialization failed - Demo mode enabled, continuing without Firebase");
+                    } else {
+                        logger.error("❌ Failed to initialize Firebase: " + e.getMessage(), e);
+                        System.err.println("❌ Failed to initialize Firebase: " + e.getMessage());
+                        throw new RuntimeException("Failed to initialize Firebase", e);
+                    }
                 }
-
-                FirebaseOptions options = optionsBuilder.build();
-                FirebaseApp.initializeApp(options);
-
-                logger.info("✅ Firebase successfully initialized");
-                System.out.println("✅ Firebase successfully initialized");
             } else {
                 logger.info("Firebase already initialized");
             }
-        } catch (IOException e) {
-            logger.error("❌ Failed to initialize Firebase: " + e.getMessage(), e);
-            System.err.println("❌ Failed to initialize Firebase: " + e.getMessage());
-            throw new RuntimeException("Failed to initialize Firebase", e);
         } catch (Exception e) {
-            logger.error("❌ Unexpected error initializing Firebase: " + e.getMessage(), e);
-            System.err.println("❌ Unexpected error initializing Firebase: " + e.getMessage());
-            throw new RuntimeException("Failed to initialize Firebase", e);
+            if (demoMode) {
+                logger.warn("🔥 Firebase initialization failed - Demo mode enabled, continuing without Firebase: " + e.getMessage());
+                System.out.println("🔥 Firebase initialization failed - Demo mode enabled, continuing without Firebase: " + e.getMessage());
+            } else {
+                logger.error("❌ Unexpected error initializing Firebase: " + e.getMessage(), e);
+                System.err.println("❌ Unexpected error initializing Firebase: " + e.getMessage());
+                throw new RuntimeException("Failed to initialize Firebase", e);
+            }
         }
     }
 }

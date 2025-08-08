@@ -43,6 +43,15 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     
     List<Booking> findByBookingDate(LocalDate bookingDate);
     
+    // New methods for user bookings with status filtering
+    List<Booking> findByUserAndStatusOrderByCreatedAtDesc(User user, Booking.BookingStatus status);
+    
+    @Query("SELECT b FROM Booking b WHERE b.user = :user AND b.status = :status ORDER BY b.createdAt DESC")
+    List<Booking> findUserBookingsByStatus(@Param("user") User user, @Param("status") Booking.BookingStatus status);
+    
+    @Query("SELECT COUNT(b) FROM Booking b WHERE b.user = :user AND b.status = :status")
+    Long countUserBookingsByStatus(@Param("user") User user, @Param("status") Booking.BookingStatus status);
+    
     @Query("SELECT b FROM Booking b WHERE b.venue = :venue AND b.bookingDate = :date AND " +
            "((b.startTime <= :startTime AND b.endTime > :startTime) OR " +
            "(b.startTime < :endTime AND b.endTime >= :endTime) OR " +

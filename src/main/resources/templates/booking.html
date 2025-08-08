@@ -182,6 +182,7 @@
             font-size: 1rem;
         }
 
+        /* Clean form styling without icons */
         .form-control,
         .form-select {
             background: white;
@@ -193,6 +194,7 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             font-weight: 500;
             width: 100%;
+            box-shadow: var(--shadow-sm);
         }
 
         .form-control:focus,
@@ -207,31 +209,12 @@
         .form-select:hover {
             border-color: var(--primary-color);
             transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
 
         .form-control::placeholder {
             color: var(--text-secondary);
             opacity: 0.7;
-        }
-
-        /* Modern Input Groups */
-        .input-group {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .input-group .form-control {
-            padding-left: 3rem;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 1rem;
-            color: var(--primary-color);
-            font-size: 1.125rem;
-            z-index: 10;
-            pointer-events: none;
         }
 
         /* Floating Labels */
@@ -464,8 +447,16 @@
             font-size: 0.875rem;
         }
 
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s;
+        /* Submit button hover effects */
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
         }
 
         .submit-btn:hover::before {
@@ -673,59 +664,39 @@
                     </div>
                     <div class="card-body">
                         <form id="bookingForm">
+                            <!-- Venue Selection Section -->
                             <div class="form-group">
                                 <label for="venue" class="form-label">
                                     <i class="bi bi-building"></i>
-                                    Select Venue
+                                    Venue Selection
                                 </label>
-                                <div class="input-group">
-                                    <i class="bi bi-building input-icon"></i>
-                                    <select class="form-select" id="venue" name="venue" required>
-                                        <option value="">Choose your preferred venue...</option>
-                                        <option th:each="venue : ${venues}" th:value="${venue.id}"
-                                            th:text="${venue.name + ' (Capacity: ' + venue.capacity + ' people)'}"
-                                            th:selected="${venue.id == selectedVenueId}">
-                                        </option>
-                                    </select>
-                                </div>
+                                <select class="form-select" id="venue" name="venue" required>
+                                    <option value="">Choose your preferred venue...</option>
+                                    <option th:each="venue : ${venues}" th:value="${venue.id}"
+                                        th:text="${venue.name + ' (Capacity: ' + venue.capacity + ' people)'}"
+                                        th:selected="${venue.id == selectedVenueId}">
+                                    </option>
+                                </select>
                             </div>
 
+                            <!-- Date & Time Section -->
                             <div class="form-group">
                                 <label for="date" class="form-label">
                                     <i class="bi bi-calendar-event"></i>
-                                    Event Date
+                                    Date & Time
                                 </label>
-                                <div class="input-group">
-                                    <i class="bi bi-calendar-event input-icon"></i>
-                                    <input type="date" class="form-control" id="date" name="date" required>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="start-time" class="form-label">
-                                            <i class="bi bi-clock"></i>
-                                            Start Time
-                                        </label>
-                                        <div class="input-group">
-                                            <i class="bi bi-clock input-icon"></i>
-                                            <input type="time" class="form-control" id="start-time" name="start-time"
-                                                required>
-                                        </div>
+                                <div class="row">
+                                    <div class="col-12 col-md-6 mb-3">
+                                        <input type="date" class="form-control" id="date" name="date" 
+                                               placeholder="dd-mm-yyyy" required>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="end-time" class="form-label">
-                                            <i class="bi bi-clock-fill"></i>
-                                            End Time
-                                        </label>
-                                        <div class="input-group">
-                                            <i class="bi bi-clock-fill input-icon"></i>
-                                            <input type="time" class="form-control" id="end-time" name="end-time"
-                                                required>
-                                        </div>
+                                    <div class="col-6 col-md-3 mb-3">
+                                        <input type="time" class="form-control" id="start-time" name="start-time"
+                                               placeholder="Start time" required>
+                                    </div>
+                                    <div class="col-6 col-md-3 mb-3">
+                                        <input type="time" class="form-control" id="end-time" name="end-time"
+                                               placeholder="End time" required>
                                     </div>
                                 </div>
                             </div>
@@ -743,16 +714,14 @@
                                 </div>
                             </div>
 
+                            <!-- Event Details Section -->
                             <div class="form-group">
                                 <label for="title" class="form-label">
                                     <i class="bi bi-pencil"></i>
-                                    Event Title
+                                    Event Details
                                 </label>
-                                <div class="input-group">
-                                    <i class="bi bi-pencil input-icon"></i>
-                                    <input type="text" class="form-control" id="title" name="title"
-                                        placeholder="e.g., Team Meeting, Workshop, Conference, Seminar..." required>
-                                </div>
+                                <input type="text" class="form-control" id="title" name="title"
+                                    placeholder="e.g., Team Meeting, Workshop, Conference, Seminar..." required>
                                 <div class="form-text">
                                     <i class="bi bi-info-circle me-1"></i>
                                     Choose a descriptive title for your event
@@ -764,11 +733,8 @@
                                     <i class="bi bi-chat-text"></i>
                                     Event Purpose & Details
                                 </label>
-                                <div class="input-group">
-                                    <i class="bi bi-chat-text input-icon"></i>
-                                    <textarea class="form-control" id="purpose" name="purpose" rows="4"
-                                        placeholder="Describe the purpose, agenda, and any special requirements for your event..."></textarea>
-                                </div>
+                                <textarea class="form-control" id="purpose" name="purpose" rows="4"
+                                    placeholder="Describe the purpose, agenda, and any special requirements for your event..."></textarea>
                                 <div class="form-text">
                                     <i class="bi bi-info-circle me-1"></i>
                                     Provide details to help us better accommodate your needs
@@ -839,6 +805,9 @@
             if (venueSelect.options.length <= 1) {
                 loadVenuesDynamically();
             }
+
+            // Pre-select venue if specified in URL or localStorage
+            preSelectVenue();
 
             // Add form validation and enhanced UX
             bookingForm.addEventListener('submit', handleBookingSubmit);
@@ -1039,6 +1008,83 @@
             form.addEventListener('submit', function () {
                 this.classList.add('loading');
             });
+        }
+
+        // Function to pre-select venue based on URL parameters or localStorage
+        function preSelectVenue() {
+            const venueSelect = document.getElementById('venue');
+            if (!venueSelect) return;
+
+            // First check URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const venueId = urlParams.get('venueId');
+            const venueName = urlParams.get('venueName');
+
+            if (venueId) {
+                console.log('Pre-selecting venue from URL:', venueId, venueName);
+                
+                // Try to find the venue option by ID (handle both string and number)
+                let found = false;
+                for (let i = 0; i < venueSelect.options.length; i++) {
+                    const option = venueSelect.options[i];
+                    if (option.value == venueId) { // Use == for loose comparison
+                        venueSelect.selectedIndex = i;
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (found) {
+                    // Show success message
+                    if (venueName) {
+                        showSuccess(`Venue "${venueName}" has been pre-selected for you!`);
+                    }
+                } else {
+                    console.log('Venue not found in options, will try again after venues load');
+                    // If venue not found, it might be because venues are loaded dynamically
+                    // We'll try again after a short delay
+                    setTimeout(() => {
+                        preSelectVenue();
+                    }, 500);
+                }
+            } else {
+                // Check localStorage as fallback
+                const storedVenueId = localStorage.getItem('selectedVenueId');
+                const storedVenueName = localStorage.getItem('selectedVenueName');
+                
+                if (storedVenueId) {
+                    console.log('Pre-selecting venue from localStorage:', storedVenueId, storedVenueName);
+                    
+                    // Try to find the venue option by ID
+                    let found = false;
+                    for (let i = 0; i < venueSelect.options.length; i++) {
+                        const option = venueSelect.options[i];
+                        if (option.value == storedVenueId) { // Use == for loose comparison
+                            venueSelect.selectedIndex = i;
+                            found = true;
+                            break;
+                        }
+                    }
+                    
+                    if (found) {
+                        // Show success message
+                        if (storedVenueName) {
+                            showSuccess(`Venue "${storedVenueName}" has been pre-selected for you!`);
+                        }
+                        
+                        // Clear localStorage after using it
+                        localStorage.removeItem('selectedVenueId');
+                        localStorage.removeItem('selectedVenueName');
+                    } else {
+                        console.log('Venue not found in options, will try again after venues load');
+                        // If venue not found, it might be because venues are loaded dynamically
+                        // We'll try again after a short delay
+                        setTimeout(() => {
+                            preSelectVenue();
+                        }, 500);
+                    }
+                }
+            }
         }
     </script>
 </body>

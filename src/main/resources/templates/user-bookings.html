@@ -546,64 +546,146 @@
                 <div class="filter-tabs">
                     <ul class="nav nav-tabs" id="bookingTabs" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all"
-                                type="button" role="tab">
+                            <a class="nav-link" th:classappend="${selectedStatus == null ? 'active' : ''}" 
+                               th:href="@{/user/bookings}" role="tab">
                                 <i class="bi bi-collection me-2"></i>All Bookings
-                            </button>
+                                <span class="badge bg-secondary ms-1" th:text="${allBookings.size()}">0</span>
+                            </a>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="confirmed-tab" data-bs-toggle="tab" data-bs-target="#confirmed"
-                                type="button" role="tab">
+                            <a class="nav-link" th:classappend="${selectedStatus == 'CONFIRMED' ? 'active' : ''}" 
+                               th:href="@{/user/bookings(status='CONFIRMED')}" role="tab">
                                 <i class="bi bi-check-circle me-2"></i>Confirmed
-                            </button>
+                                <span class="badge bg-success ms-1" th:text="${confirmedCount}">0</span>
+                            </a>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending"
-                                type="button" role="tab">
+                            <a class="nav-link" th:classappend="${selectedStatus == 'PENDING' ? 'active' : ''}" 
+                               th:href="@{/user/bookings(status='PENDING')}" role="tab">
                                 <i class="bi bi-clock me-2"></i>Pending
-                            </button>
+                                <span class="badge bg-warning ms-1" th:text="${pendingCount}">0</span>
+                            </a>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="cancelled-tab" data-bs-toggle="tab" data-bs-target="#cancelled"
-                                type="button" role="tab">
+                            <a class="nav-link" th:classappend="${selectedStatus == 'CANCELLED' ? 'active' : ''}" 
+                               th:href="@{/user/bookings(status='CANCELLED')}" role="tab">
                                 <i class="bi bi-x-circle me-2"></i>Cancelled
-                            </button>
+                                <span class="badge bg-danger ms-1" th:text="${cancelledCount}">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" th:classappend="${selectedStatus == 'REJECTED' ? 'active' : ''}" 
+                               th:href="@{/user/bookings(status='REJECTED')}" role="tab">
+                                <i class="bi bi-x-circle me-2"></i>Rejected
+                                <span class="badge bg-danger ms-1" th:text="${rejectedCount}">0</span>
+                            </a>
                         </li>
                     </ul>
                 </div>
 
                 <!-- Bookings Content -->
-                <div class="tab-content" id="bookingTabsContent">
-                    <div class="tab-pane fade show active" id="all" role="tabpanel">
-                        <div class="bookings-container">
-                            <div id="all-bookings" class="row">
-                                <!-- Bookings will be loaded here -->
-                                <div class="col-12">
-                                    <div class="loading-spinner">
-                                        <div class="spinner-custom"></div>
+                <div class="bookings-container">
+                    <div class="row">
+                        <!-- Show bookings if available -->
+                        <div th:if="${not #lists.isEmpty(bookings)}" class="col-12">
+                            <div class="row">
+                                <div th:each="booking : ${bookings}" class="col-lg-6 col-xl-4 mb-4">
+                                    <div class="booking-card">
+                                        <div class="booking-header">
+                                            <div class="booking-title" th:text="${booking.title}">Booking Title</div>
+                                            <div class="booking-venue">
+                                                <i class="bi bi-building me-1"></i>
+                                                <span th:text="${booking.venue.name}">Venue Name</span>
+                                            </div>
+                                            <div class="booking-date">
+                                                <i class="bi bi-calendar me-1"></i>
+                                                <span th:text="${#temporals.format(booking.bookingDate, 'EEEE, MMMM d, yyyy')}">Date</span>
+                                            </div>
+                                        </div>
+                                        <div class="booking-body">
+                                            <div class="booking-details">
+                                                <div class="detail-item">
+                                                    <div class="detail-icon time">
+                                                        <i class="bi bi-clock"></i>
+                                                    </div>
+                                                    <div class="detail-text">
+                                                        <div class="detail-label">Time</div>
+                                                        <div class="detail-value">
+                                                            <span th:text="${#temporals.format(booking.startTime, 'HH:mm')}">Start</span> - 
+                                                            <span th:text="${#temporals.format(booking.endTime, 'HH:mm')}">End</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="detail-item">
+                                                    <div class="detail-icon capacity">
+                                                        <i class="bi bi-people"></i>
+                                                    </div>
+                                                    <div class="detail-text">
+                                                        <div class="detail-label">Capacity</div>
+                                                        <div class="detail-value">
+                                                            <span th:text="${booking.venue.capacity}">0</span> people
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div th:if="${booking.purpose != null and !booking.purpose.isEmpty()}" class="detail-item">
+                                                    <div class="detail-icon purpose">
+                                                        <i class="bi bi-chat-text"></i>
+                                                    </div>
+                                                    <div class="detail-text">
+                                                        <div class="detail-label">Purpose</div>
+                                                        <div class="detail-value" th:text="${booking.purpose}">Purpose</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <span class="status-badge" th:class="${'status-' + #strings.toLowerCase(booking.status.name())}">
+                                                    <i class="bi" th:class="${booking.status.name() == 'CONFIRMED' ? 'bi-check-circle' : 
+                                                                          booking.status.name() == 'PENDING' ? 'bi-clock' : 
+                                                                          booking.status.name() == 'REJECTED' ? 'bi-x-circle' : 
+                                                                          booking.status.name() == 'CANCELLED' ? 'bi-x-circle' : 'bi-clock'}"></i>
+                                                    <span th:text="${booking.status.name()}">Status</span>
+                                                </span>
+                                            </div>
+                                            <div class="booking-actions">
+                                                <button th:if="${booking.status.name() == 'PENDING'}" 
+                                                        class="action-btn danger" 
+                                                        th:onclick="'cancelBooking(' + ${booking.id} + ')'">
+                                                    <i class="bi bi-x-circle"></i>Cancel
+                                                </button>
+                                                <a th:if="${booking.status.name() == 'CONFIRMED'}" 
+                                                   th:href="@{'/booking/' + ${booking.id}}" 
+                                                   class="action-btn primary">
+                                                    <i class="bi bi-eye"></i>View Details
+                                                </a>
+                                                <button class="action-btn secondary" 
+                                                        th:onclick="'copyBookingInfo(' + ${booking.id} + ')'">
+                                                    <i class="bi bi-clipboard"></i>Copy Info
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="tab-pane fade" id="confirmed" role="tabpanel">
-                        <div class="bookings-container">
-                            <div id="confirmed-bookings" class="row">
-                                <!-- Confirmed bookings will be loaded here -->
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade" id="pending" role="tabpanel">
-                        <div class="bookings-container">
-                            <div id="pending-bookings" class="row">
-                                <!-- Pending bookings will be loaded here -->
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade" id="cancelled" role="tabpanel">
-                        <div class="bookings-container">
-                            <div id="cancelled-bookings" class="row">
-                                <!-- Cancelled bookings will be loaded here -->
+                        
+                        <!-- Show empty state if no bookings -->
+                        <div th:if="${#lists.isEmpty(bookings)}" class="col-12">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <i class="bi bi-calendar-x"></i>
+                                </div>
+                                <div class="empty-state-title">No Bookings Found</div>
+                                <div class="empty-state-text">
+                                    <span th:if="${selectedStatus != null}">
+                                        You don't have any <span th:text="${selectedStatus.toLowerCase()}">status</span> bookings.
+                                    </span>
+                                    <span th:if="${selectedStatus == null}">
+                                        You haven't made any bookings yet.
+                                    </span>
+                                </div>
+                                <a href="/booking" class="empty-state-btn">
+                                    <i class="bi bi-plus-circle me-2"></i>Book a Venue
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -614,173 +696,36 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JavaScript -->
-    <script src="/js/user-bookings.js"></script>
 
     <script>
-        // Enhanced booking display functionality
+        // Global functions for booking actions
+        function cancelBooking(bookingId) {
+            if (confirm('Are you sure you want to cancel this booking?')) {
+                // Implement cancel booking logic
+                console.log('Cancelling booking:', bookingId);
+                // You can make an AJAX call here to cancel the booking
+                // fetch(`/api/bookings/${bookingId}/cancel`, { method: 'POST' })
+                //     .then(response => response.json())
+                //     .then(data => {
+                //         if (data.success) {
+                //             location.reload();
+                //         } else {
+                //             alert('Failed to cancel booking: ' + data.error);
+                //         }
+                //     });
+            }
+        }
+
+        function copyBookingInfo(bookingId) {
+            // Implement copy booking info logic
+            console.log('Copying booking info:', bookingId);
+            // You can use navigator.clipboard.writeText() to copy to clipboard
+            // For now, just show an alert
+            alert('Booking info copied to clipboard!');
+        }
+
+        // Add hover effects for interactive elements
         document.addEventListener('DOMContentLoaded', function () {
-            // Add intersection observer for scroll animations
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver(function (entries) {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                    }
-                });
-            }, observerOptions);
-
-            // Function to create booking card
-            function createBookingCard(booking) {
-                const card = document.createElement('div');
-                card.className = 'col-lg-6 col-xl-4 mb-4';
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(30px)';
-                card.style.transition = 'all 0.6s ease-out';
-
-                const statusClass = getStatusClass(booking.status);
-                const statusIcon = getStatusIcon(booking.status);
-
-                card.innerHTML = `
-                    <div class="booking-card">
-                        <div class="booking-header">
-                            <div class="booking-title">${booking.title}</div>
-                            <div class="booking-venue">
-                                <i class="bi bi-building me-1"></i>${booking.venueName}
-                            </div>
-                            <div class="booking-date">
-                                <i class="bi bi-calendar me-1"></i>${formatDate(booking.date)}
-                            </div>
-                        </div>
-                        <div class="booking-body">
-                            <div class="booking-details">
-                                <div class="detail-item">
-                                    <div class="detail-icon time">
-                                        <i class="bi bi-clock"></i>
-                                    </div>
-                                    <div class="detail-text">
-                                        <div class="detail-label">Time</div>
-                                        <div class="detail-value">${booking.startTime} - ${booking.endTime}</div>
-                                    </div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-icon capacity">
-                                        <i class="bi bi-people"></i>
-                                    </div>
-                                    <div class="detail-text">
-                                        <div class="detail-label">Capacity</div>
-                                        <div class="detail-value">${booking.venueCapacity} people</div>
-                                    </div>
-                                </div>
-                                ${booking.purpose ? `
-                                <div class="detail-item">
-                                    <div class="detail-icon purpose">
-                                        <i class="bi bi-chat-text"></i>
-                                    </div>
-                                    <div class="detail-text">
-                                        <div class="detail-label">Purpose</div>
-                                        <div class="detail-value">${booking.purpose}</div>
-                                    </div>
-                                </div>
-                                ` : ''}
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="status-badge ${statusClass}">
-                                    <i class="bi ${statusIcon}"></i>
-                                    ${booking.status}
-                                </span>
-                            </div>
-                            <div class="booking-actions">
-                                ${booking.status === 'PENDING' ? `
-                                    <button class="action-btn danger" onclick="cancelBooking(${booking.id})">
-                                        <i class="bi bi-x-circle"></i>Cancel
-                                    </button>
-                                ` : ''}
-                                ${booking.status === 'CONFIRMED' ? `
-                                    <a href="/booking/${booking.id}" class="action-btn primary">
-                                        <i class="bi bi-eye"></i>View Details
-                                    </a>
-                                ` : ''}
-                                <button class="action-btn secondary" onclick="copyBookingInfo(${booking.id})">
-                                    <i class="bi bi-clipboard"></i>Copy Info
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                observer.observe(card);
-                return card;
-            }
-
-            function getStatusClass(status) {
-                switch (status.toUpperCase()) {
-                    case 'CONFIRMED': return 'status-confirmed';
-                    case 'PENDING': return 'status-pending';
-                    case 'REJECTED': return 'status-rejected';
-                    case 'CANCELLED': return 'status-cancelled';
-                    default: return 'status-pending';
-                }
-            }
-
-            function getStatusIcon(status) {
-                switch (status.toUpperCase()) {
-                    case 'CONFIRMED': return 'bi-check-circle';
-                    case 'PENDING': return 'bi-clock';
-                    case 'REJECTED': return 'bi-x-circle';
-                    case 'CANCELLED': return 'bi-x-circle';
-                    default: return 'bi-clock';
-                }
-            }
-
-            function formatDate(dateString) {
-                const date = new Date(dateString);
-                return date.toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-            }
-
-            function showEmptyState(containerId, message) {
-                const container = document.getElementById(containerId);
-                container.innerHTML = `
-                    <div class="col-12">
-                        <div class="empty-state">
-                            <div class="empty-state-icon">
-                                <i class="bi bi-calendar-x"></i>
-                            </div>
-                            <div class="empty-state-title">No Bookings Found</div>
-                            <div class="empty-state-text">${message}</div>
-                            <a href="/booking" class="empty-state-btn">
-                                <i class="bi bi-plus-circle me-2"></i>Book a Venue
-                            </a>
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Global functions for booking actions
-            window.cancelBooking = function (bookingId) {
-                if (confirm('Are you sure you want to cancel this booking?')) {
-                    // Implement cancel booking logic
-                    console.log('Cancelling booking:', bookingId);
-                }
-            };
-
-            window.copyBookingInfo = function (bookingId) {
-                // Implement copy booking info logic
-                console.log('Copying booking info:', bookingId);
-                // You can use navigator.clipboard.writeText() to copy to clipboard
-            };
-
-            // Add hover effects for interactive elements
             document.addEventListener('mouseover', function (e) {
                 if (e.target.classList.contains('action-btn')) {
                     e.target.style.transform = 'translateY(-2px)';

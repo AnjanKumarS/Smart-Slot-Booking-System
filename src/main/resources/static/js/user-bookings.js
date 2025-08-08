@@ -1,37 +1,220 @@
-// User Bookings JavaScript for Smart Slot Booking System
-
-// Global variables
-let allBookings = [];
-let currentUser = null;
-
-// API Base URL
+// User Bookings JavaScript - Client-side filtering approach
 const API_BASE = '/api';
 
-// Initialize page
-document.addEventListener('DOMContentLoaded', function() {
-    initializeUserBookings();
+let allBookings = [];
+
+// Initialize the page
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('=== User Bookings: Initializing ===');
+    loadUserBookings();
+    setupTabFiltering();
 });
 
-function initializeUserBookings() {
-    // Load bookings
-    loadUserBookings();
+function setupTabFiltering() {
+    // Get all tab buttons
+    const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
     
-    // Set up event listeners
-    setupEventListeners();
-    
-    // Initialize the first tab (All Bookings)
-    setTimeout(() => {
-        filterBookings('all');
-    }, 100);
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function (e) {
+            e.preventDefault();
+            
+            // Remove active class from all tabs
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked tab
+            this.classList.add('active');
+            
+            // Get the target tab content
+            const targetId = this.getAttribute('data-bs-target');
+            const targetContent = document.querySelector(targetId);
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('show', 'active');
+            });
+            
+            // Show target content
+            if (targetContent) {
+                targetContent.classList.add('show', 'active');
+            }
+            
+            // Filter bookings based on tab
+            const status = this.getAttribute('data-status');
+            filterBookings(status);
+        });
+    });
 }
 
-function setupEventListeners() {
-    // Tab change events
-    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
-        tab.addEventListener('shown.bs.tab', function (event) {
-            const target = event.target.getAttribute('data-bs-target');
-            filterBookings(target);
-        });
+function filterBookings(status) {
+    console.log('=== Filtering bookings ===');
+    console.log('Filter:', status);
+    console.log('All bookings:', allBookings);
+    
+    let filteredBookings;
+    
+    if (status === 'all' || !status) {
+        filteredBookings = allBookings;
+    } else {
+        filteredBookings = allBookings.filter(booking => 
+            booking.status.toUpperCase() === status.toUpperCase()
+        );
+    }
+    
+    console.log('Filtered bookings:', filteredBookings);
+    
+    // Display filtered bookings
+    displayBookings(filteredBookings, status);
+}
+
+function displayBookings(bookings, status) {
+    console.log('=== Displaying bookings ===');
+    console.log('Filter:', status);
+    console.log('Bookings to display:', bookings);
+    
+    const containerId = status === 'all' || !status ? 'all-bookings' : `${status}-bookings`;
+    const container = document.getElementById(containerId);
+    
+    if (!container) {
+        console.error('Container not found:', containerId);
+        return;
+    }
+    
+    if (bookings.length === 0) {
+        container.innerHTML = `
+            <div class="col-12">
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="bi bi-calendar-x"></i>
+                    </div>
+                    <div class="empty-state-title">No Bookings Found</div>
+                    <div class="empty-state-text">
+                        ${status === 'all' || !status ? 
+                            "You haven't made any bookings yet." : 
+                            `You don't have any ${status.toLowerCase()} bookings.`}
+                    </div>
+                    <a href="/booking" class="empty-state-btn">
+                        <i class="bi bi-plus-circle me-2"></i>Book a Venue
+                    </a>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = '';
+    
+    bookings.forEach(booking => {
+        const bookingCard = createBookingCard(booking);
+        container.appendChild(bookingCard);
+    });
+}
+
+function createBookingCard(booking) {
+    const card = document.createElement('div');
+    card.className = 'col-lg-6 col-xl-4 mb-4';
+    card.setAttribute('data-status', booking.status.toLowerCase());
+    
+    const statusClass = getStatusClass(booking.status);
+    const statusIcon = getStatusIcon(booking.status);
+    
+    card.innerHTML = `
+        <div class="booking-card">
+            <div class="booking-header">
+                <div class="booking-title">${booking.title}</div>
+                <div class="booking-venue">
+                    <i class="bi bi-building me-1"></i>${booking.venue?.name || 'Unknown Venue'}
+                </div>
+                <div class="booking-date">
+                    <i class="bi bi-calendar me-1"></i>${formatDate(booking.bookingDate)}
+                </div>
+            </div>
+            <div class="booking-body">
+                <div class="booking-details">
+                    <div class="detail-item">
+                        <div class="detail-icon time">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                        <div class="detail-text">
+                            <div class="detail-label">Time</div>
+                            <div class="detail-value">${booking.startTime} - ${booking.endTime}</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon capacity">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div class="detail-text">
+                            <div class="detail-label">Capacity</div>
+                            <div class="detail-value">${booking.venue?.capacity || 'N/A'} people</div>
+                        </div>
+                    </div>
+                    ${booking.purpose ? `
+                    <div class="detail-item">
+                        <div class="detail-icon purpose">
+                            <i class="bi bi-chat-text"></i>
+                        </div>
+                        <div class="detail-text">
+                            <div class="detail-label">Purpose</div>
+                            <div class="detail-value">${booking.purpose}</div>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="status-badge ${statusClass}">
+                        <i class="bi ${statusIcon}"></i>
+                        ${booking.status}
+                    </span>
+                </div>
+                <div class="booking-actions">
+                    ${booking.status === 'PENDING' ? `
+                        <button class="action-btn danger" onclick="cancelBooking(${booking.id})">
+                            <i class="bi bi-x-circle"></i>Cancel
+                        </button>
+                    ` : ''}
+                    ${booking.status === 'CONFIRMED' ? `
+                        <a href="/booking/${booking.id}" class="action-btn primary">
+                            <i class="bi bi-eye"></i>View Details
+                        </a>
+                    ` : ''}
+                    <button class="action-btn secondary" onclick="copyBookingInfo(${booking.id})">
+                        <i class="bi bi-clipboard"></i>Copy Info
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    return card;
+}
+
+function getStatusClass(status) {
+    switch (status.toUpperCase()) {
+        case 'CONFIRMED': return 'status-confirmed';
+        case 'PENDING': return 'status-pending';
+        case 'REJECTED': return 'status-rejected';
+        case 'CANCELLED': return 'status-cancelled';
+        default: return 'status-pending';
+    }
+}
+
+function getStatusIcon(status) {
+    switch (status.toUpperCase()) {
+        case 'CONFIRMED': return 'bi-check-circle';
+        case 'PENDING': return 'bi-clock';
+        case 'REJECTED': return 'bi-x-circle';
+        case 'CANCELLED': return 'bi-x-circle';
+        default: return 'bi-clock';
+    }
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
     });
 }
 
@@ -70,11 +253,9 @@ async function loadUserBookings() {
                 });
             });
             
-            // Populate all tabs
+            // Display all bookings initially
             displayBookings(allBookings, 'all');
-            displayBookings(allBookings.filter(b => b.status === 'CONFIRMED'), 'confirmed');
-            displayBookings(allBookings.filter(b => b.status === 'PENDING'), 'pending');
-            displayBookings(allBookings.filter(b => b.status === 'REJECTED'), 'cancelled');
+            
         } else {
             console.error('User Bookings: Failed to load bookings:', data.error);
             showError('Failed to load bookings: ' + (data.error || 'Unknown error'));
@@ -84,220 +265,26 @@ async function loadUserBookings() {
         console.error('User Bookings: Error details:', error);
         console.error('User Bookings: Error message:', error.message);
         console.error('User Bookings: Error stack:', error.stack);
-        
-        // Show more specific error message
-        if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            showError('Network error: Unable to connect to server. Please check your connection and try again.');
-        } else {
-            showError('Error loading bookings: ' + error.message);
-        }
+        showError('Error loading bookings: ' + error.message);
     }
-}
-
-function displayBookings(bookings, filter) {
-    console.log('=== Displaying bookings ===');
-    console.log('Filter:', filter);
-    console.log('Bookings to display:', bookings);
-    
-    const containerId = `${filter}-bookings`;
-    const container = document.getElementById(containerId);
-    
-    if (!container) {
-        console.error('Container not found:', containerId);
-        return;
-    }
-    
-    if (bookings.length === 0) {
-        container.innerHTML = `
-            <div class="col-12 text-center">
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle me-2"></i>
-                    No ${filter} bookings found.
-                </div>
-            </div>
-        `;
-        return;
-    }
-    
-    container.innerHTML = '';
-    
-    bookings.forEach(booking => {
-        console.log('Processing booking:', booking);
-        
-        const bookingCard = document.createElement('div');
-        bookingCard.className = 'col-lg-6 col-xl-4 mb-4';
-        
-        const statusClass = getStatusClass(booking.status);
-        const statusText = getStatusText(booking.status);
-        
-        // Get venue name safely
-        const venueName = booking.venue && booking.venue.name ? booking.venue.name : 'Unknown Venue';
-        const venueLocation = booking.venue && booking.venue.location ? booking.venue.location : '';
-        
-        bookingCard.innerHTML = `
-            <div class="booking-card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <h5 class="card-title mb-0">${booking.title || 'Untitled Event'}</h5>
-                        <span class="status-badge ${statusClass}">${statusText}</span>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <small class="text-muted">
-                            <i class="bi bi-building me-1"></i>
-                            ${venueName}${venueLocation ? ` - ${venueLocation}` : ''}
-                        </small>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-6">
-                            <small class="text-muted">
-                                <i class="bi bi-calendar me-1"></i>
-                                ${formatDate(booking.bookingDate)}
-                            </small>
-                        </div>
-                        <div class="col-6">
-                            <small class="text-muted">
-                                <i class="bi bi-clock me-1"></i>
-                                ${booking.startTime} - ${booking.endTime}
-                            </small>
-                        </div>
-                    </div>
-                    
-                    ${booking.purpose ? `
-                        <div class="mb-3">
-                            <small class="text-muted">
-                                <i class="bi bi-info-circle me-1"></i>
-                                ${booking.purpose}
-                            </small>
-                        </div>
-                    ` : ''}
-                    
-                    <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">
-                            ID: #${booking.id}
-                        </small>
-                        <div class="btn-group btn-group-sm">
-                            <button class="btn btn-outline-primary btn-sm" onclick="viewDetails(${booking.id})">
-                                <i class="bi bi-eye me-1"></i>Details
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        container.appendChild(bookingCard);
-    });
-}
-
-function filterBookings(filter) {
-    console.log('=== Filtering bookings ===');
-    console.log('Filter:', filter);
-    console.log('All bookings:', allBookings);
-    
-    let filteredBookings = [];
-    
-    switch (filter) {
-        case 'all':
-            filteredBookings = allBookings;
-            break;
-        case 'confirmed':
-            filteredBookings = allBookings.filter(booking => booking.status === 'CONFIRMED');
-            break;
-        case 'pending':
-            filteredBookings = allBookings.filter(booking => booking.status === 'PENDING');
-            break;
-        case 'cancelled':
-            filteredBookings = allBookings.filter(booking => booking.status === 'REJECTED');
-            break;
-        default:
-            filteredBookings = allBookings;
-    }
-    
-    console.log('Filtered bookings:', filteredBookings);
-    displayBookings(filteredBookings, filter.replace('#', ''));
-}
-
-function getStatusClass(status) {
-    switch (status) {
-        case 'PENDING':
-            return 'status-pending';
-        case 'CONFIRMED':
-            return 'status-confirmed';
-        case 'REJECTED':
-            return 'status-rejected';
-        default:
-            return 'status-pending';
-    }
-}
-
-function getStatusText(status) {
-    switch (status) {
-        case 'PENDING':
-            return 'Pending';
-        case 'CONFIRMED':
-            return 'Confirmed';
-        case 'REJECTED':
-            return 'Rejected';
-        default:
-            return status;
-    }
-}
-
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-    });
-}
-
-function viewDetails(bookingId) {
-    // For now, just show an alert. This can be expanded to show a modal with details
-    const booking = allBookings.find(b => b.id === bookingId);
-    if (booking) {
-        alert(`Booking Details:\n\nVenue: ${booking.venue?.name}\nDate: ${formatDate(booking.bookingDate)}\nTime: ${booking.startTime} - ${booking.endTime}\nPurpose: ${booking.purpose || 'Not specified'}`);
-    }
-}
-
-function showSuccess(message) {
-    // Create success alert
-    const alertDiv = document.createElement('div');
-    alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
-    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-    alertDiv.innerHTML = `
-        <i class="bi bi-check-circle me-2"></i>${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    
-    document.body.appendChild(alertDiv);
-    
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-        if (alertDiv.parentNode) {
-            alertDiv.remove();
-        }
-    }, 5000);
 }
 
 function showError(message) {
-    // Create error alert
-    const alertDiv = document.createElement('div');
-    alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed';
-    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-    alertDiv.innerHTML = `
-        <i class="bi bi-exclamation-triangle me-2"></i>${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    
-    document.body.appendChild(alertDiv);
-    
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-        if (alertDiv.parentNode) {
-            alertDiv.remove();
-        }
-    }, 5000);
+    console.error('User Bookings: Error:', message);
+    // You can implement a proper error display here
+    alert('Error: ' + message);
+}
+
+// Global functions for booking actions
+function cancelBooking(bookingId) {
+    if (confirm('Are you sure you want to cancel this booking?')) {
+        console.log('Cancelling booking:', bookingId);
+        // Implement cancel booking logic here
+    }
+}
+
+function copyBookingInfo(bookingId) {
+    console.log('Copying booking info:', bookingId);
+    // Implement copy booking info logic here
+    alert('Booking info copied to clipboard!');
 } 
