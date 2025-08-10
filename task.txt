@@ -1,2 +1,0 @@
-admin dashboard showing the data 
-manage - "An error occurred while trying to cancel the booking". Its not deleting.

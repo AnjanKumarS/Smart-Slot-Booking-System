@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
 import com.smartslot.model.User;
 import com.smartslot.service.FirebaseUserDetailsService;
+import com.smartslot.service.AuthService;
 import com.smartslot.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,9 @@ public class AuthController {
     
     @Autowired
     private FirebaseUserDetailsService firebaseUserDetailsService;
+    
+    @Autowired
+    private AuthService authService;
     
     @Autowired
     private UserRepository userRepository;
@@ -57,6 +61,14 @@ public class AuthController {
             } else {
                 // Firebase not initialized, decode the JWT token
                 user = createUserFromJWTToken(idToken);
+            }
+            
+            // Validate email domain
+            if (!authService.isValidEmailDomain(user.getEmail())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+                    "error", "Access Denied",
+                    "message", "Only @rvce.edu.in email addresses are allowed to access this system"
+                ));
             }
             
             // Set session attributes

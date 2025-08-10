@@ -76,12 +76,14 @@ public class ChatbotService {
      */
     public List<String> getChatSuggestions() {
         return Arrays.asList(
-            "Book the main auditorium for tomorrow at 2 PM",
-            "Check availability for Conference Room A",
-            "Show me my bookings",
-            "What venues are available?",
-            "Cancel my booking for today",
-            "Find a venue for 50 people"
+            "🎯 Book CS Auditorium for tomorrow at 2 PM",
+            "📅 Check availability for ISE Seminar Hall",
+            "📋 Show me my current bookings",
+            "🏢 What venues are available today?",
+            "❌ Cancel my booking for today",
+            "🔍 Find a venue for 50 people",
+            "💡 How do I book a venue?",
+            "⏰ What are the booking hours?"
         );
     }
     
@@ -267,9 +269,29 @@ public class ChatbotService {
         
         List<Venue> venues = venueService.getAllActiveVenues();
         
-        response.put("success", true);
-        response.put("response", "Here are our available venues:");
-        response.put("available_venues", venues);
+        if (venues.isEmpty()) {
+            response.put("success", true);
+            response.put("response", "🏢 **Available Venues**\n\nCurrently, there are no venues available for booking. Please check back later or contact the administration.");
+        } else {
+            StringBuilder venueList = new StringBuilder();
+            venueList.append("🏢 **RVCE Available Venues**\n\n");
+            
+            for (Venue venue : venues) {
+                venueList.append("📍 **").append(venue.getName()).append("**\n");
+                venueList.append("   📍 Location: ").append(venue.getLocation()).append("\n");
+                venueList.append("   👥 Capacity: ").append(venue.getCapacity()).append(" people\n");
+                if (venue.getDescription() != null && !venue.getDescription().isEmpty()) {
+                    venueList.append("   📝 ").append(venue.getDescription()).append("\n");
+                }
+                venueList.append("   💰 **Free for RVCE students & staff**\n\n");
+            }
+            
+            venueList.append("💡 **To book a venue, simply say:** \"Book [venue name] for [date] at [time]\"");
+            
+            response.put("success", true);
+            response.put("response", venueList.toString());
+            response.put("available_venues", venues);
+        }
         
         return response;
     }
@@ -287,10 +309,41 @@ public class ChatbotService {
         
         if (userBookings.isEmpty()) {
             response.put("success", true);
-            response.put("response", "You don't have any bookings yet. Would you like to make one?");
+            response.put("response", "📋 **Your Bookings**\n\nYou don't have any bookings yet! 🎯\n\nWould you like to make your first booking? Just say:\n• \"Book CS Auditorium for tomorrow at 2 PM\"\n• \"Show me available venues\"\n• \"Help me book a venue\"");
         } else {
+            StringBuilder bookingList = new StringBuilder();
+            bookingList.append("📋 **Your Recent Bookings**\n\n");
+            
+            for (Booking booking : userBookings) {
+                bookingList.append("🎯 **").append(booking.getTitle()).append("**\n");
+                bookingList.append("   📍 Venue: ").append(booking.getVenue().getName()).append("\n");
+                bookingList.append("   📅 Date: ").append(booking.getBookingDate()).append("\n");
+                bookingList.append("   ⏰ Time: ").append(booking.getStartTime()).append(" - ").append(booking.getEndTime()).append("\n");
+                bookingList.append("   📊 Status: ");
+                
+                switch (booking.getStatus()) {
+                    case PENDING:
+                        bookingList.append("⏳ Pending Approval");
+                        break;
+                    case CONFIRMED:
+                        bookingList.append("✅ Confirmed");
+                        break;
+                    case REJECTED:
+                        bookingList.append("❌ Rejected");
+                        break;
+                    case CANCELLED:
+                        bookingList.append("🚫 Cancelled");
+                        break;
+                    default:
+                        bookingList.append(booking.getStatus());
+                }
+                bookingList.append("\n\n");
+            }
+            
+            bookingList.append("💡 **Need to cancel?** Just say: \"Cancel my booking for [date]\"");
+            
             response.put("success", true);
-            response.put("response", "Here are your recent bookings:");
+            response.put("response", bookingList.toString());
             response.put("bookings", userBookings);
         }
         
@@ -306,13 +359,19 @@ public class ChatbotService {
     private Map<String, Object> handleHelpIntent(String message, User user) {
         Map<String, Object> response = new HashMap<>();
         
-        String helpMessage = "I'm your booking assistant! Here's what I can help you with:\n\n" +
-            "📅 **Make Bookings**: \"Book the main auditorium for tomorrow at 2 PM\"\n" +
-            "🔍 **Check Availability**: \"Is Conference Room A available on Friday?\"\n" +
+        String helpMessage = "🎓 **Welcome to RVCE Smart Slot Booking Assistant!**\n\n" +
+            "I'm here to help you manage venue bookings at RVCE. Here's what I can do:\n\n" +
+            "🎯 **Quick Bookings**: \"Book CS Auditorium for tomorrow at 2 PM\"\n" +
+            "📅 **Check Availability**: \"Is ISE Seminar Hall available on Friday?\"\n" +
             "🏢 **Browse Venues**: \"Show me all available venues\"\n" +
-            "📋 **View Your Bookings**: \"Show me my bookings\"\n" +
-            "❌ **Cancel Bookings**: \"Cancel my booking for today\"\n\n" +
-            "Just tell me what you need in natural language, and I'll help you out!";
+            "📋 **View Your Bookings**: \"Show me my current bookings\"\n" +
+            "❌ **Cancel Bookings**: \"Cancel my booking for today\"\n" +
+            "🔍 **Find Venues**: \"Find a venue for 50 people\"\n\n" +
+            "💡 **Pro Tips**:\n" +
+            "• All venues are free for RVCE students and staff\n" +
+            "• Bookings require admin approval\n" +
+            "• You'll receive email confirmation once approved\n\n" +
+            "Just ask me anything in natural language! 🚀";
         
         response.put("success", true);
         response.put("response", helpMessage);
@@ -332,7 +391,7 @@ public class ChatbotService {
         if (demoMode || openAiApiKey == null || openAiApiKey.isEmpty()) {
             // Demo response
             response.put("success", true);
-            response.put("response", "I'm here to help you with venue bookings! You can ask me to book a venue, check availability, or view your bookings. What would you like to do?");
+            response.put("response", "🎓 **RVCE Smart Slot Assistant**\n\nI'm here to help you with venue bookings at RVCE! 🏢\n\nYou can ask me to:\n• 🎯 Book venues (\"Book CS Auditorium for tomorrow at 2 PM\")\n• 📅 Check availability (\"Is ISE Seminar Hall available?\")\n• 📋 View your bookings (\"Show me my bookings\")\n• 🏢 Browse venues (\"What venues are available?\")\n• ❌ Cancel bookings (\"Cancel my booking\")\n\n💡 **All venues are free for RVCE students & staff!**\n\nWhat would you like to do today? 🚀");
             return response;
         }
         

@@ -268,11 +268,15 @@ async function authenticateWithBackend(idToken) {
             body: JSON.stringify({ idToken: idToken })
         });
         
+        const data = await response.json();
+        
         if (!response.ok) {
+            // Handle email domain restriction error
+            if (response.status === 403 && data.message) {
+                throw new Error(data.message);
+            }
             throw new Error(`Backend authentication failed: ${response.status}`);
         }
-        
-        const data = await response.json();
         
         // Store authentication data
         localStorage.setItem('authToken', idToken);

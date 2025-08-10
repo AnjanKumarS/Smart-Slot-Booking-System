@@ -27,6 +27,14 @@ public class AuthService {
      * @return Map containing user info and token
      */
     public Map<String, Object> demoLogin(String email, User.UserRole role) {
+        // Validate email domain
+        if (!isValidEmailDomain(email)) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("error", "Only @rvce.edu.in email addresses are allowed");
+            return response;
+        }
+        
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> createDemoUser(email, role));
         
@@ -39,6 +47,20 @@ public class AuthService {
         response.put("user", createUserResponse(user));
         
         return response;
+    }
+    
+    /**
+     * Validate if email domain is allowed (@rvce.edu.in only)
+     * @param email User email
+     * @return boolean true if email domain is valid
+     */
+    public boolean isValidEmailDomain(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return false;
+        }
+        
+        String domain = email.trim().toLowerCase();
+        return domain.endsWith("@rvce.edu.in");
     }
     
     /**
