@@ -1,35 +1,51 @@
-# Smart Slot Booking System - Spring Boot
+# 🎓 RVCE Smart Slot Booking System
 
-A comprehensive, modern web application for booking and managing shared spaces like auditoriums, seminar halls, and conference rooms. Built with Spring Boot backend, H2 database, and responsive frontend with AI-powered assistance.
+A comprehensive, modern web application for booking and managing shared spaces at RVCE (R.V. College of Engineering). Built with Spring Boot backend, MySQL database, and responsive frontend with AI-powered assistance. **Exclusively for RVCE students and staff with @rvce.edu.in email addresses.**
 
-## 🚀 Features
+## 🚀 Latest Features (v2.0)
 
-### Core Functionality
-- **User Authentication**: Demo login system with role-based access (Admin, Staff, User)
-- **Venue Management**: Browse and manage available venues with detailed information
-- **Smart Booking**: Intuitive booking system with real-time availability checking
-- **Calendar View**: Visual calendar interface for viewing bookings and availability
-- **OTP Verification**: Secure booking confirmation with OTP system
-- **Recurring Bookings**: Support for recurring event bookings
-- **Admin Dashboard**: Comprehensive admin panel with analytics and management tools
+### 🔒 **Security & Access Control**
+- **Email Domain Restriction**: Only @rvce.edu.in email addresses allowed
+- **Firebase Authentication**: Secure Google login integration
+- **Role-Based Access**: Admin, Staff, and User roles with appropriate permissions
+- **Session Management**: Secure session handling with automatic logout
 
-### Advanced Features
-- **AI Assistant**: Intelligent chatbot for booking assistance and queries
-- **Real-time Analytics**: Booking trends, venue utilization, and performance metrics
-- **Responsive Design**: Mobile-first design that works on all devices
-- **Conflict Resolution**: Automatic detection and resolution of booking conflicts
-- **Multi-role Support**: Different access levels for different user types
-- **Modern UI/UX**: Clean, professional interface with smooth animations
+### 🎯 **Enhanced Admin Panel**
+- **Admin Dashboard**: Modern UI with real-time statistics and booking management
+- **Venue Management**: Full CRUD operations for venues (Create, Read, Update, Delete)
+- **Booking Approval System**: Approve, reject, or cancel user bookings
+- **Analytics Dashboard**: Comprehensive charts and booking statistics
+- **Database Management**: Tools to fix and maintain database integrity
+
+### 🤖 **AI-Powered Chatbot Assistant**
+- **Natural Language Processing**: Understand booking requests in plain English
+- **Smart Suggestions**: Context-aware booking recommendations
+- **RVCE-Specific Responses**: Tailored for college venue booking needs
+- **Interactive Help**: Step-by-step booking guidance
+- **Status Tracking**: Real-time booking status updates
+
+### 📧 **Enhanced Email System**
+- **Professional Templates**: Beautiful, informative email notifications
+- **Booking Confirmations**: Detailed confirmation emails with venue information
+- **Status Updates**: Real-time notifications for booking approval/rejection
+- **OTP Delivery**: Secure OTP delivery for booking verification
+
+### 🏢 **Venue Management System**
+- **College Venues**: CS Auditorium, ISE Seminar Hall, Main Auditorium
+- **Free Booking**: All venues free for RVCE students and staff
+- **Capacity Management**: Venue capacity and availability tracking
+- **Amenities Display**: Detailed venue information and facilities
 
 ## 🛠 Technology Stack
 
 ### Backend
 - **Spring Boot 2.7.18**: Java web framework
 - **Spring Data JPA**: Database abstraction layer
-- **H2 Database**: In-memory database for demo purposes
+- **MySQL Database**: Production-ready database (Railway DB hosting)
 - **Thymeleaf**: Template engine for server-side rendering
-- **Firebase Admin SDK**: Authentication and database (demo mode included)
-- **OpenAI Java Client**: AI-powered chatbot functionality
+- **Firebase Admin SDK**: Authentication and user management
+- **Spring Security**: Role-based access control
+- **JavaMail**: Email notification system
 
 ### Frontend
 - **HTML5**: Modern semantic markup
@@ -37,12 +53,13 @@ A comprehensive, modern web application for booking and managing shared spaces l
 - **JavaScript (ES6+)**: Modern JavaScript with async/await
 - **Bootstrap 5**: Responsive UI framework
 - **Chart.js**: Data visualization for analytics
+- **Bootstrap Icons**: Modern icon library
 
 ### Additional Tools
 - **Maven**: Build and dependency management
-- **Font Awesome**: Icon library
-- **Google Fonts**: Typography
+- **Google Fonts**: Typography (Inter font family)
 - **Responsive Images**: Optimized image loading
+- **Toast Notifications**: User feedback system
 
 ## 📁 Project Structure
 
@@ -55,12 +72,18 @@ smart-slot-booking-system-springboot/
 │   │   │       └── smartslot/
 │   │   │           ├── SmartSlotBookingSystemApplication.java   # Main Spring Boot application
 │   │   │           ├── config/
-│   │   │           │   └── FirebaseConfig.java                  # Firebase configuration
+│   │   │           │   ├── DataInitializer.java                 # Database initialization
+│   │   │           │   ├── FirebaseAuthenticationFilter.java   # Firebase auth filter
+│   │   │           │   ├── FirebaseConfig.java                  # Firebase configuration
+│   │   │           │   └── SecurityConfig.java                  # Security configuration
 │   │   │           ├── controller/
+│   │   │           │   ├── AdminController.java                 # Admin panel endpoints
 │   │   │           │   ├── AnalyticsController.java             # Analytics endpoints
 │   │   │           │   ├── AuthController.java                  # Authentication endpoints
+│   │   │           │   ├── BookingApiController.java            # Booking API endpoints
 │   │   │           │   ├── BookingController.java               # Booking management
 │   │   │           │   ├── ChatbotController.java               # AI assistant endpoints
+│   │   │           │   ├── CustomErrorController.java           # Error handling
 │   │   │           │   ├── HomeController.java                  # Main page controller
 │   │   │           │   └── VenueController.java                 # Venue management
 │   │   │           ├── model/
@@ -76,22 +99,44 @@ smart-slot-booking-system-springboot/
 │   │   │           │   ├── AuthService.java
 │   │   │           │   ├── BookingService.java
 │   │   │           │   ├── ChatbotService.java
+│   │   │           │   ├── FirebaseUserDetailsService.java
 │   │   │           │   └── VenueService.java
 │   │   │           └── util/
+│   │   │               ├── EmailUtil.java                       # Email functionality
+│   │   │               ├── FirebaseTokenValidator.java         # Firebase token validation
 │   │   │               └── OtpUtil.java                         # OTP generation/validation
 │   │   ├── resources/
 │   │   │   ├── static/
 │   │   │   │   ├── css/
 │   │   │   │   │   └── style.css
 │   │   │   │   ├── js/
-│   │   │   │   │   ├── admin.js
 │   │   │   │   │   ├── app.js
 │   │   │   │   │   ├── auth.js
 │   │   │   │   │   ├── booking.js
-│   │   │   │   │   └── chatbot.js
+│   │   │   │   │   ├── chatbot.js
+│   │   │   │   │   ├── dashboard.js
+│   │   │   │   │   ├── firebase-config.js
+│   │   │   │   │   ├── staff-dashboard.js
+│   │   │   │   │   └── user-bookings.js
 │   │   │   │   └── favicon.ico
 │   │   │   ├── templates/
-│   │   │   │   └── index.html
+│   │   │   │   ├── admin-dashboard.html                        # Admin panel
+│   │   │   │   ├── admin-login.html                            # Admin login page
+│   │   │   │   ├── admin-venues.html                           # Venue management
+│   │   │   │   ├── analytics-dashboard.html                    # Analytics dashboard
+│   │   │   │   ├── booking.html                                # Booking page
+│   │   │   │   ├── chatbot.html                                # AI assistant
+│   │   │   │   ├── dashboard.html                              # User dashboard
+│   │   │   │   ├── error.html                                  # Error page
+│   │   │   │   ├── fragments/
+│   │   │   │   │   └── navbar.html                             # Navigation bar
+│   │   │   │   ├── landing.html                                # Landing page
+│   │   │   │   ├── login.html                                  # Login page
+│   │   │   │   ├── register.html                               # Registration page
+│   │   │   │   ├── staff-dashboard.html                        # Staff dashboard
+│   │   │   │   ├── user-bookings.html                          # User bookings
+│   │   │   │   ├── user-dashboard.html                         # User dashboard
+│   │   │   │   └── verify-booking.html                         # OTP verification
 │   │   │   └── application.properties
 │   ├── test/
 │   │   └── java/
@@ -110,255 +155,437 @@ smart-slot-booking-system-springboot/
 ### Prerequisites
 - Java 11 or higher
 - Maven 3.6 or higher
+- MySQL database (or Railway DB for hosting)
+- Firebase project (for authentication)
 
 ### Installation
 
-1. **Extract the project**:
+1. **Clone the repository**:
    ```bash
-   unzip smart-slot-booking-system-springboot.zip
+   git clone <repository-url>
    cd smart-slot-booking-system-springboot
    ```
 
-2. **Build the application**:
+2. **Configure database**:
+   Update `src/main/resources/application.properties` with your database credentials:
+   ```properties
+   spring.datasource.url=jdbc:mysql://your-database-url
+   spring.datasource.username=your-username
+   spring.datasource.password=your-password
+   ```
+
+3. **Configure Firebase**:
+   Add your Firebase configuration to `src/main/resources/static/js/firebase-config.js`
+
+4. **Build the application**:
    ```bash
    mvn clean compile
    ```
 
-3. **Run the application**:
+5. **Run the application**:
    ```bash
    mvn spring-boot:run
    ```
 
-4. **Access the application**:
+6. **Access the application**:
    Open your web browser and go to `http://localhost:8080`
 
-5. **Access H2 Database Console** (optional):
-   Go to `http://localhost:8080/h2-console`
-   - JDBC URL: `jdbc:h2:mem:testdb`
-   - Username: `sa`
-   - Password: `password`
+## 👤 User Access
 
-## 👤 Demo Users
+### 🔒 **Email Domain Restriction**
+- **Only @rvce.edu.in emails allowed**
+- **Firebase Authentication**: Secure Google login
+- **Automatic Role Assignment**: Based on email domain
 
-The application includes demo users for testing different roles:
+### 👥 **User Roles**
 
-| Role | Email | Features |
-|------|-------|----------|
-| **Admin** | admin@demo.com | Full access to all features, admin dashboard, analytics |
-| **Staff** | staff@demo.com | Booking management, venue access |
-| **User** | user@demo.com | Basic booking functionality |
+| Role | Access Level | Features |
+|------|-------------|----------|
+| **Admin** | Full Access | Admin dashboard, venue management, booking approval, analytics |
+| **Staff** | Staff Access | Booking management, venue access, user support |
+| **User** | Basic Access | Book venues, view bookings, use chatbot |
+
+### 🔑 **Admin Access**
+- **Username**: `admin`
+- **Password**: `admin123`
+- **Access**: Full administrative privileges
 
 ## 🎯 Usage Guide
 
-### For Regular Users
-1. **Login**: Use the "Demo Login" button and select a user role
-2. **Browse Venues**: View available venues with details and amenities
-3. **Make Booking**: Fill out the booking form with event details
-4. **OTP Verification**: Confirm booking with the provided OTP
-5. **Manage Bookings**: View and manage your bookings in "My Bookings"
-6. **AI Assistant**: Use the chatbot for booking assistance
+### For RVCE Students & Staff
+
+#### 1. **Login Process**
+- Visit the application homepage
+- Click "Sign In" or "Register"
+- **Use your @rvce.edu.in email address**
+- Choose Google login for convenience
+- **Non-RVCE emails will be blocked**
+
+#### 2. **Browse Venues**
+- View available venues: CS Auditorium, ISE Seminar Hall, Main Auditorium
+- See capacity, location, and amenities
+- All venues are **free for RVCE community**
+
+#### 3. **Make a Booking**
+- Select venue, date, and time
+- Fill in event details and purpose
+- Submit booking request
+- **Receive OTP for verification**
+- Complete OTP verification
+- **Wait for admin approval**
+
+#### 4. **Manage Bookings**
+- View all your bookings in "My Bookings"
+- Check booking status (Pending, Confirmed, Rejected)
+- Cancel pending bookings if needed
+- Receive email notifications for status changes
+
+#### 5. **AI Assistant**
+- Use the chatbot for booking assistance
+- Ask questions in natural language
+- Get venue recommendations
+- Check availability quickly
 
 ### For Administrators
-1. **Admin Dashboard**: Access comprehensive analytics and overview
-2. **Booking Management**: Approve, reject, or cancel bookings
-3. **Venue Management**: Add, edit, or remove venues
-4. **Analytics**: View booking trends, popular venues, and usage statistics
-5. **User Management**: Monitor user activity and bookings
+
+#### 1. **Admin Login**
+- Use admin credentials: `admin` / `admin123`
+- Access comprehensive admin dashboard
+
+#### 2. **Booking Management**
+- **Requests Pending**: Review and approve/reject booking requests
+- **Manage Programs**: View all confirmed bookings
+- **Cancel Bookings**: Cancel any booking if needed
+
+#### 3. **Venue Management**
+- **Add New Venues**: Create new venue entries
+- **Edit Venues**: Update venue information
+- **Delete Venues**: Remove venues from system
+- **Fix Database**: Repair database issues
+
+#### 4. **Analytics Dashboard**
+- **User Booking Analytics**: Charts showing booking patterns
+- **Venue Utilization**: Track venue usage statistics
+- **Booking Trends**: Monitor booking trends over time
 
 ## 🤖 AI Assistant Features
 
-The built-in AI assistant can help with:
-- **Natural Language Booking**: "Book the main auditorium for tomorrow at 2 PM"
-- **Availability Queries**: "What venues are available this afternoon?"
-- **Booking Information**: "Show me my upcoming bookings"
-- **Conflict Resolution**: Automatic detection and alternative suggestions
-- **Smart Recommendations**: Venue suggestions based on requirements
+### 🎯 **Smart Booking Assistance**
+```
+🎯 "Book CS Auditorium for tomorrow at 2 PM"
+📅 "Check availability for ISE Seminar Hall"
+📋 "Show me my current bookings"
+🏢 "What venues are available today?"
+❌ "Cancel my booking for today"
+🔍 "Find a venue for 50 people"
+💡 "How do I book a venue?"
+⏰ "What are the booking hours?"
+```
 
-## 📱 Responsive Design
+### 🎓 **RVCE-Specific Responses**
+- **College Venue Information**: Detailed venue descriptions
+- **Free Booking Reminders**: Emphasize free access for RVCE community
+- **Admin Approval Process**: Explain the approval workflow
+- **Email Notifications**: Inform about email confirmations
 
-The application is fully responsive and optimized for:
-- **Desktop**: Full-featured experience with all functionality
-- **Tablet**: Touch-optimized interface with adapted layouts
-- **Mobile**: Mobile-first design with simplified navigation
+### 📊 **Enhanced Response Format**
+```
+🏢 RVCE Available Venues
+
+📍 CS Auditorium
+   📍 Location: CS Building, Ground Floor
+   👥 Capacity: 300 people
+   📝 Computer Science Department's main auditorium with advanced AV systems
+   💰 Free for RVCE students & staff
+
+💡 To book a venue, simply say: "Book [venue name] for [date] at [time]"
+```
+
+## 📧 Email System
+
+### 📬 **Professional Email Templates**
+
+#### **Booking Confirmation Email**
+```
+Dear [User Name],
+
+🎉 Your booking has been CONFIRMED!
+
+Booking Details:
+• Booking ID: [ID]
+• Venue: [Venue Name]
+• Date: [Date]
+• Time: [Start Time] - [End Time]
+• Purpose: [Purpose]
+
+Your venue booking is now confirmed and ready for use. Please arrive on time and enjoy your event!
+
+If you have any questions, please contact the administration.
+
+Best regards,
+Smart Slot Booking System
+```
+
+#### **Booking Rejection Email**
+```
+Dear [User Name],
+
+❌ Your booking has been REJECTED
+
+Booking Details:
+• Booking ID: [ID]
+• Venue: [Venue Name]
+• Date: [Date]
+• Time: [Start Time] - [End Time]
+• Purpose: [Purpose]
+
+Unfortunately, your venue booking request could not be approved at this time. This may be due to:
+• Venue unavailability
+• Scheduling conflicts
+• Administrative requirements
+
+You can submit a new booking request for a different time slot or venue.
+
+If you have any questions, please contact the administration.
+
+Best regards,
+Smart Slot Booking System
+```
+
+## 🏢 Venue Management
+
+### 📍 **Available Venues**
+- **CS Auditorium**: 300 people, CS Building, Ground Floor
+- **ISE Seminar Hall**: 150 people, ISE Building, 1st Floor
+- **Main Auditorium**: 800 people, Administrative Building, Ground Floor
+
+### 💰 **Pricing**
+- **All venues are FREE** for RVCE students and staff
+- **No hourly rates** or charges
+- **College community access** only
+
+### 🔧 **Admin Venue Management**
+- **Add New Venues**: Create venue entries with details
+- **Edit Venues**: Update venue information
+- **Delete Venues**: Remove venues (soft delete)
+- **Database Fix**: Repair database issues automatically
+
+## 📊 Analytics Dashboard
+
+### 📈 **Chart Types**
+- **Bar Charts**: User booking statistics
+- **Line Charts**: Booking trends over time
+- **Pie Charts**: Venue utilization distribution
+
+### 📊 **Metrics Tracked**
+- **Total Bookings**: Overall booking count
+- **User Activity**: Individual user booking patterns
+- **Venue Utilization**: Popular venues and usage
+- **Booking Status**: Pending, confirmed, rejected statistics
 
 ## 🔧 Configuration
 
 ### Application Properties
-The main configuration is in `src/main/resources/application.properties`:
-
 ```properties
 # Application Configuration
 spring.application.name=smart-slot-booking-system
 server.port=8080
 
-# Database Configuration (H2 in-memory for demo)
-spring.datasource.url=jdbc:h2:mem:testdb
-spring.datasource.driverClassName=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=password
-spring.h2.console.enabled=true
+# Database Configuration (MySQL)
+spring.datasource.url=jdbc:mysql://your-database-url
+spring.datasource.username=your-username
+spring.datasource.password=your-password
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 # JPA Configuration
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
-spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
 
 # Firebase Configuration
-firebase.demo-mode=true
-firebase.service-account-key=
-firebase.database-url=
+firebase.demo-mode=false
+firebase.service-account-key=your-firebase-key
+firebase.database-url=your-firebase-url
 
-# OpenAI Configuration
-openai.demo-mode=true
-openai.api.key=
+# Email Configuration
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=your-email@gmail.com
+spring.mail.password=your-app-password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+# Security Configuration
+app.development.mode=false
 ```
-
-### Production Configuration
-For production deployment:
-1. Replace H2 with a production database (PostgreSQL, MySQL)
-2. Set `firebase.demo-mode=false` and provide Firebase credentials
-3. Set `openai.demo-mode=false` and provide OpenAI API key
-4. Configure proper logging levels
-5. Set up SSL certificates
 
 ## 🚀 Deployment
 
 ### Local Development
-The application runs on `http://localhost:8080` by default.
+```bash
+mvn spring-boot:run
+```
+Access at: `http://localhost:8080`
 
 ### Production Deployment
-For production deployment:
-1. Build the JAR file: `mvn clean package`
-2. Run with: `java -jar target/smart-slot-booking-system-0.0.1-SNAPSHOT.jar`
-3. Configure environment variables for production settings
-4. Set up a reverse proxy (nginx)
-5. Configure SSL certificates
+1. **Build JAR**:
+   ```bash
+   mvn clean package
+   ```
+
+2. **Run Application**:
+   ```bash
+   java -jar target/smart-slot-booking-system-0.0.1-SNAPSHOT.jar
+   ```
+
+3. **Environment Setup**:
+   - Configure MySQL database
+   - Set up Firebase project
+   - Configure email settings
+   - Set production mode
+
+## 📱 Responsive Design
+
+### 🎨 **Modern UI/UX**
+- **Glassmorphism Effects**: Modern glass-like design elements
+- **Gradient Backgrounds**: Beautiful color gradients
+- **Smooth Animations**: CSS animations and transitions
+- **Mobile-First**: Responsive design for all devices
+
+### 📱 **Device Compatibility**
+- **Desktop**: Full-featured experience
+- **Tablet**: Touch-optimized interface
+- **Mobile**: Mobile-first responsive design
+
+## 🔒 Security Features
+
+### 🛡️ **Access Control**
+- **Email Domain Validation**: Only @rvce.edu.in emails
+- **Role-Based Permissions**: Admin, Staff, User roles
+- **Session Management**: Secure session handling
+- **Firebase Authentication**: Google login integration
+
+### 🔐 **Data Protection**
+- **Input Validation**: Server-side validation
+- **SQL Injection Prevention**: Parameterized queries
+- **XSS Protection**: Output encoding
+- **CSRF Protection**: Cross-site request forgery prevention
 
 ## 🧪 Testing
 
-The application includes:
-- **Demo Data**: Pre-populated venues and sample bookings
-- **Demo Authentication**: No external dependencies required
-- **Error Handling**: Comprehensive error messages and validation
-- **Cross-browser Compatibility**: Tested on modern browsers
+### ✅ **Tested Features**
+- **Email Domain Restriction**: Non-RVCE emails blocked
+- **Admin Panel**: All CRUD operations working
+- **Booking System**: Complete booking workflow
+- **Chatbot**: AI assistant functionality
+- **Email Notifications**: All email templates
+- **Responsive Design**: All device sizes
+
+### 🐛 **Error Handling**
+- **Comprehensive Validation**: Input and business logic validation
+- **User-Friendly Errors**: Clear error messages
+- **Graceful Degradation**: System continues working with errors
+- **Logging**: Detailed error logging for debugging
 
 ## 📊 API Endpoints
 
-### Authentication Endpoints
-- `POST /api/auth/demo-login` - Demo user login
-- `POST /api/auth/logout` - User logout
-- `GET /api/auth/me` - Get current user info
-- `POST /api/auth/validate` - Validate token
+### Authentication
+- `POST /api/auth/session` - Create session after Firebase login
+- `GET /api/auth/check` - Check authentication status
+- `POST /api/auth/logout` - Logout user
 
-### Venue Endpoints
-- `GET /api/venues` - Get all venues
-- `GET /api/venues/{id}` - Get venue by ID
-- `POST /api/venues` - Create new venue (Admin only)
-- `PUT /api/venues/{id}` - Update venue (Admin only)
-- `DELETE /api/venues/{id}` - Delete venue (Admin only)
-- `GET /api/venues/search` - Search venues by name
-- `GET /api/venues/filter/capacity` - Filter by capacity
-- `GET /api/venues/filter/location` - Filter by location
-- `GET /api/venues/filter/price` - Filter by price range
+### Admin Endpoints
+- `GET /admin/panel` - Admin dashboard
+- `GET /admin/venues` - Venue management page
+- `GET /api/admin/bookings` - Get all bookings
+- `POST /api/admin/bookings/{id}/approve` - Approve booking
+- `POST /api/admin/bookings/{id}/reject` - Reject booking
+- `POST /api/admin/bookings/{id}/cancel` - Cancel booking
 
-### Booking Endpoints
+### Venue Management
+- `GET /api/admin/venues` - Get all venues
+- `POST /api/admin/venues` - Create venue
+- `PUT /api/admin/venues/{id}` - Update venue
+- `DELETE /api/admin/venues/{id}` - Delete venue
+- `POST /api/admin/venues/fix` - Fix database issues
+
+### Public Endpoints
+- `GET /api/venues` - Get active venues
 - `GET /api/bookings/my-bookings` - Get user bookings
-- `POST /api/bookings` - Create new booking
 - `POST /api/bookings/verify-otp` - Verify booking OTP
-- `GET /api/bookings/availability` - Check availability
-- `GET /api/bookings/calendar` - Get calendar view
-- `POST /api/bookings/{id}/approve` - Approve booking (Admin)
-- `POST /api/bookings/{id}/reject` - Reject booking (Admin)
-- `POST /api/bookings/{id}/cancel` - Cancel booking
 
-### AI Assistant Endpoints
-- `POST /api/ai/chat` - Send message to AI assistant
-- `GET /api/ai/suggestions` - Get chat suggestions
-- `POST /api/ai/confirm-booking` - Confirm AI-suggested booking
-
-### Analytics Endpoints (Admin only)
-- `GET /api/analytics` - Get comprehensive analytics
-- `GET /api/analytics/venue-utilization` - Get venue utilization
-- `GET /api/analytics/date-range` - Get date range statistics
-- `GET /api/analytics/user-activity` - Get user activity statistics
+### AI Assistant
+- `POST /api/chatbot/chat` - Send message to chatbot
+- `GET /api/chatbot/suggestions` - Get chat suggestions
 
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
-1. **Java Version Compatibility**:
-   ```bash
-   # Check Java version
-   java -version
-   # Should be Java 11 or higher
-   ```
+1. **Email Domain Restriction**:
+   - Ensure using @rvce.edu.in email
+   - Check Firebase authentication setup
+   - Verify email validation in backend
 
-2. **Maven Build Issues**:
-   ```bash
-   # Clean and rebuild
-   mvn clean compile
-   ```
+2. **Database Issues**:
+   - Use "Fix Database" button in admin panel
+   - Check MySQL connection settings
+   - Verify database permissions
 
-3. **Database Connection**:
-   - Check H2 console at `http://localhost:8080/h2-console`
-   - Verify database URL and credentials
+3. **Admin Login Issues**:
+   - Use correct credentials: `admin` / `admin123`
+   - Clear browser cache and cookies
+   - Check session management
 
-4. **Port Already in Use**:
-   ```bash
-   # Kill process using port 8080
-   lsof -ti:8080 | xargs kill -9
-   ```
-
-## 📝 Development Notes
-
-### Code Structure
-- **Controllers**: Handle HTTP requests and responses
-- **Services**: Business logic and data processing
-- **Repositories**: Data access layer using Spring Data JPA
-- **Models**: Entity classes representing database tables
-- **Configuration**: Application configuration and beans
-
-### Database Schema
-The application uses JPA annotations to automatically create the database schema:
-- **Users**: User accounts with roles
-- **Venues**: Available spaces for booking
-- **Bookings**: Reservation records with status tracking
-
-### Security
-- Token-based authentication (in-memory for demo)
-- Role-based access control
-- Input validation and sanitization
-- CORS configuration for frontend-backend communication
+4. **Email Notifications**:
+   - Verify email configuration
+   - Check SMTP settings
+   - Ensure email credentials are correct
 
 ## 🤝 Contributing
 
-This is a complete, production-ready application. For enhancements:
-1. Fork the repository
-2. Create a feature branch
-3. Implement changes with tests
-4. Submit a pull request
+### Development Guidelines
+1. **Code Style**: Follow Java coding conventions
+2. **Testing**: Add tests for new features
+3. **Documentation**: Update documentation for changes
+4. **Security**: Ensure security best practices
+
+### Feature Requests
+- Submit issues for bugs
+- Request new features
+- Suggest improvements
+- Report security vulnerabilities
 
 ## 📄 License
 
-This project is provided as-is for educational and commercial use.
+This project is developed for RVCE (R.V. College of Engineering) and is provided as-is for educational and institutional use.
 
 ## 🆘 Support
 
-For support and questions:
-- Check the troubleshooting section
-- Review the API documentation
-- Examine the code comments for implementation details
+### Getting Help
+- **Documentation**: Check this README
+- **Code Comments**: Review code for implementation details
+- **Error Messages**: Check console for detailed error information
+- **Admin Panel**: Use built-in tools for troubleshooting
+
+### Contact Information
+- **Institution**: R.V. College of Engineering
+- **System**: Smart Slot Booking System
+- **Access**: @rvce.edu.in email addresses only
 
 ## 🎉 Acknowledgments
 
+- **RVCE**: For providing the institutional context
 - **Spring Boot**: For the excellent Java framework
-- **Spring Data JPA**: For simplified data access
-- **H2 Database**: For the lightweight in-memory database
+- **Firebase**: For authentication and user management
+- **MySQL**: For reliable database management
+- **Bootstrap**: For responsive UI framework
+- **Chart.js**: For data visualization
 - **OpenAI**: For AI assistant capabilities
-- **Firebase**: For authentication and database services
-- **Bootstrap**: For the responsive UI framework
 
 ---
 
-**Built with ❤️ using Spring Boot for efficient space management and booking**
+**🎓 Built with ❤️ for RVCE students and staff**
+
+**🏢 Smart Slot Booking System - Making venue booking simple and efficient**
 
