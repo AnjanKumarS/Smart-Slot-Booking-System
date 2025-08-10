@@ -186,7 +186,7 @@ public class BookingService {
      * @return List of all bookings
      */
     public List<Booking> getAllBookings() {
-        return bookingRepository.findAll();
+        return bookingRepository.findAllWithUserAndVenue();
     }
     
     /**
@@ -221,21 +221,43 @@ public class BookingService {
             return response;
         }
         
-        booking.setStatus(Booking.BookingStatus.APPROVED);
+        booking.setStatus(Booking.BookingStatus.CONFIRMED);
         booking.setApprovedAt(LocalDateTime.now());
+        booking.setConfirmedAt(LocalDateTime.now());
         booking.setApprovedBy(approvedBy);
         bookingRepository.save(booking);
         // Send approval email
         if (booking.getUser() != null && booking.getUser().getEmail() != null) {
+            String emailContent = String.format(
+                "Dear %s,\n\n" +
+                "🎉 Your booking has been CONFIRMED!\n\n" +
+                "Booking Details:\n" +
+                "• Booking ID: %d\n" +
+                "• Venue: %s\n" +
+                "• Date: %s\n" +
+                "• Time: %s - %s\n" +
+                "• Purpose: %s\n\n" +
+                "Your venue booking is now confirmed and ready for use. Please arrive on time and enjoy your event!\n\n" +
+                "If you have any questions, please contact the administration.\n\n" +
+                "Best regards,\nSmart Slot Booking System",
+                booking.getUser().getName(),
+                booking.getId(),
+                booking.getVenue().getName(),
+                booking.getBookingDate(),
+                booking.getStartTime(),
+                booking.getEndTime(),
+                booking.getPurpose()
+            );
+            
             emailUtil.sendEmail(
                 booking.getUser().getEmail(),
-                "Booking Approved",
-                "Your booking (ID: " + booking.getId() + ") has been approved."
+                "🎉 Booking Confirmed - Smart Slot Booking System",
+                emailContent
             );
         }
         
         response.put("success", true);
-        response.put("message", "Booking approved successfully");
+        response.put("message", "Booking confirmed successfully");
         response.put("booking", booking);
         
         return response;
@@ -268,10 +290,35 @@ public class BookingService {
         bookingRepository.save(booking);
         // Send rejection email
         if (booking.getUser() != null && booking.getUser().getEmail() != null) {
+            String emailContent = String.format(
+                "Dear %s,\n\n" +
+                "❌ Your booking has been REJECTED\n\n" +
+                "Booking Details:\n" +
+                "• Booking ID: %d\n" +
+                "• Venue: %s\n" +
+                "• Date: %s\n" +
+                "• Time: %s - %s\n" +
+                "• Purpose: %s\n\n" +
+                "Unfortunately, your venue booking request could not be approved at this time. This may be due to:\n" +
+                "• Venue unavailability\n" +
+                "• Scheduling conflicts\n" +
+                "• Administrative requirements\n\n" +
+                "You can submit a new booking request for a different time slot or venue.\n\n" +
+                "If you have any questions, please contact the administration.\n\n" +
+                "Best regards,\nSmart Slot Booking System",
+                booking.getUser().getName(),
+                booking.getId(),
+                booking.getVenue().getName(),
+                booking.getBookingDate(),
+                booking.getStartTime(),
+                booking.getEndTime(),
+                booking.getPurpose()
+            );
+            
             emailUtil.sendEmail(
                 booking.getUser().getEmail(),
-                "Booking Rejected",
-                "Sorry, your booking (ID: " + booking.getId() + ") was rejected."
+                "❌ Booking Rejected - Smart Slot Booking System",
+                emailContent
             );
         }
         
@@ -338,6 +385,31 @@ public class BookingService {
             response.put("error", "Invalid user object");
             return response;
         }
+    }
+
+    /**
+     * Admin cancel booking
+     * @param bookingId Booking ID
+     * @return Map containing cancellation result
+     */
+    public Map<String, Object> adminCancelBooking(Long bookingId) {
+        Map<String, Object> response = new HashMap<>();
+        
+        Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
+        if (optionalBooking.isEmpty()) {
+            response.put("success", false);
+            response.put("error", "Booking not found");
+            return response;
+        }
+        
+        Booking booking = optionalBooking.get();
+        booking.setStatus(Booking.BookingStatus.CANCELLED);
+        bookingRepository.save(booking);
+        
+        response.put("success", true);
+        response.put("message", "Booking cancelled successfully");
+        
+        return response;
     }
     
     /**
@@ -552,6 +624,15 @@ public class BookingService {
         }
         
         return bookingRepository.save(booking);
+    }
+
+    public void markOtpAsVerified(Long bookingId) {
+        Optional<Booking> bookingOpt = bookingRepository.findById(bookingId);
+        if (bookingOpt.isPresent()) {
+            Booking booking = bookingOpt.get();
+            booking.setOtpVerified(true);
+            bookingRepository.save(booking);
+        }
     }
     
     /**

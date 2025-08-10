@@ -22,12 +22,10 @@ public class Booking {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "venue_id", nullable = false)
-    @JsonIgnore
     private Venue venue;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnore
     private User user;
     
     @Column(name = "booking_date", nullable = false)

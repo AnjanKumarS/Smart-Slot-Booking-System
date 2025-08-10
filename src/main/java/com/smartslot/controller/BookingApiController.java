@@ -239,11 +239,11 @@ public class BookingApiController {
             return ResponseEntity.status(400).body(response);
         }
         if (providedOtp.equals(sessionOtp)) {
-            bookingService.confirmBooking(bookingId);
+            bookingService.markOtpAsVerified(bookingId);
             session.removeAttribute("bookingOtp");
             session.removeAttribute("bookingId");
             response.put("success", true);
-            response.put("message", "Booking confirmed");
+            response.put("message", "Successfully submitted your request, wait for admin approval.");
         } else {
             response.put("success", false);
             response.put("error", "Invalid OTP");

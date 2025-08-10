@@ -7,8 +7,7 @@
     <title>Analytics Dashboard | Smart Slot Booking System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -221,7 +220,7 @@
 
         .chart-header {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
         }
@@ -273,53 +272,6 @@
             color: white;
             border-color: transparent;
             transform: translateY(-2px);
-        }
-
-        /* Recent Activity */
-        .activity-card {
-            background: white;
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border: none;
-        }
-
-        .activity-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem 0;
-            border-bottom: 1px solid #f8f9fa;
-        }
-
-        .activity-item:last-child {
-            border-bottom: none;
-        }
-
-        .activity-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            margin-right: 1rem;
-            font-size: 1rem;
-        }
-
-        .activity-content {
-            flex: 1;
-        }
-
-        .activity-title {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 0.25rem;
-        }
-
-        .activity-time {
-            font-size: 0.85rem;
-            color: #6c757d;
         }
 
         /* Loading States */
@@ -405,7 +357,7 @@
                         <i class="bi bi-graph-up me-3"></i>Analytics Dashboard
                     </h1>
                     <p class="analytics-subtitle animate__animated animate__fadeInUp animate__delay-1s">
-                        Comprehensive insights into your booking system performance
+                        User booking analytics and insights
                     </p>
                 </div>
                 <div class="col-lg-4 text-end">
@@ -466,12 +418,12 @@
                 <div class="col-lg-3 col-md-6 mb-4">
                     <div class="stats-card info animate__animated animate__fadeInUp animate__delay-5s">
                         <div class="stats-icon info">
-                            <i class="bi bi-building"></i>
+                            <i class="bi bi-people"></i>
                         </div>
-                        <div class="stats-number" id="totalVenues">0</div>
-                        <div class="stats-label">Active Venues</div>
+                        <div class="stats-number" id="activeUsers">0</div>
+                        <div class="stats-label">Active Users</div>
                         <div class="stats-change positive">
-                            <i class="bi bi-arrow-up me-1"></i>+3% from last month
+                            <i class="bi bi-arrow-up me-1"></i>+15% from last month
                         </div>
                     </div>
                 </div>
@@ -494,98 +446,52 @@
 
         <!-- Charts Section -->
         <div class="charts-section">
-            <div class="row">
-                <!-- Booking Status Chart -->
-                <div class="col-lg-8 mb-4">
+            <!-- Bar Chart -->
+            <div class="row mb-4">
+                <div class="col-12">
                     <div class="chart-card animate__animated animate__fadeInUp animate__delay-7s">
                         <div class="chart-header">
                             <div>
-                                <h3 class="chart-title">Booking Status Overview</h3>
-                                <p class="chart-subtitle">Distribution of bookings by status</p>
-                            </div>
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-outline-primary btn-sm"
-                                    onclick="changeChartType('bar')">Bar</button>
-                                <button type="button" class="btn btn-outline-primary btn-sm"
-                                    onclick="changeChartType('doughnut')">Doughnut</button>
+                                <h3 class="chart-title">User Booking Analytics - Bar Chart</h3>
+                                <p class="chart-subtitle">Number of bookings made by each user</p>
                             </div>
                         </div>
-                        <canvas id="bookingStatusChart" height="100"></canvas>
-                    </div>
-                </div>
-
-                <!-- Monthly Trends Chart -->
-                <div class="col-lg-4 mb-4">
-                    <div class="chart-card animate__animated animate__fadeInUp animate__delay-8s">
-                        <div class="chart-header">
-                            <div>
-                                <h3 class="chart-title">Monthly Trends</h3>
-                                <p class="chart-subtitle">Booking trends over time</p>
-                            </div>
+                        <div style="height: 400px;">
+                            <canvas id="userBookingBarChart"></canvas>
                         </div>
-                        <canvas id="monthlyTrendsChart" height="100"></canvas>
                     </div>
                 </div>
             </div>
 
-            <div class="row">
-                <!-- Venue Performance Chart -->
-                <div class="col-lg-6 mb-4">
+            <!-- Line Chart -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="chart-card animate__animated animate__fadeInUp animate__delay-8s">
+                        <div class="chart-header">
+                            <div>
+                                <h3 class="chart-title">User Booking Analytics - Line Chart</h3>
+                                <p class="chart-subtitle">Booking trends by user</p>
+                            </div>
+                        </div>
+                        <div style="height: 400px;">
+                            <canvas id="userBookingLineChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pie Chart -->
+            <div class="row mb-4">
+                <div class="col-12">
                     <div class="chart-card animate__animated animate__fadeInUp animate__delay-9s">
                         <div class="chart-header">
                             <div>
-                                <h3 class="chart-title">Top Venues</h3>
-                                <p class="chart-subtitle">Most popular venues by bookings</p>
+                                <h3 class="chart-title">User Booking Analytics - Pie Chart</h3>
+                                <p class="chart-subtitle">Distribution of bookings by user</p>
                             </div>
                         </div>
-                        <canvas id="venuePerformanceChart" height="100"></canvas>
-                    </div>
-                </div>
-
-                <!-- Recent Activity -->
-                <div class="col-lg-6 mb-4">
-                    <div class="activity-card animate__animated animate__fadeInUp animate__delay-10s">
-                        <div class="chart-header">
-                            <h3 class="chart-title">Recent Activity</h3>
-                            <p class="chart-subtitle">Latest booking activities</p>
-                        </div>
-                        <div id="recentActivity">
-                            <div class="activity-item">
-                                <div class="activity-icon success">
-                                    <i class="bi bi-calendar-check"></i>
-                                </div>
-                                <div class="activity-content">
-                                    <div class="activity-title">New booking confirmed</div>
-                                    <div class="activity-time">Conference Room A - 2 minutes ago</div>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-icon warning">
-                                    <i class="bi bi-clock"></i>
-                                </div>
-                                <div class="activity-content">
-                                    <div class="activity-title">Booking pending approval</div>
-                                    <div class="activity-time">Auditorium - 15 minutes ago</div>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-icon danger">
-                                    <i class="bi bi-x-circle"></i>
-                                </div>
-                                <div class="activity-content">
-                                    <div class="activity-title">Booking rejected</div>
-                                    <div class="activity-time">Meeting Room B - 1 hour ago</div>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-icon info">
-                                    <i class="bi bi-building"></i>
-                                </div>
-                                <div class="activity-content">
-                                    <div class="activity-title">New venue added</div>
-                                    <div class="activity-time">Training Center - 2 hours ago</div>
-                                </div>
-                            </div>
+                        <div style="height: 400px;">
+                            <canvas id="userBookingPieChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -604,35 +510,204 @@
 
     <script>
         // Global variables
-        let bookingStatusChart, monthlyTrendsChart, venuePerformanceChart;
+        let userBookingBarChart, userBookingLineChart, userBookingPieChart;
         let currentPeriod = '7d';
 
         // Initialize charts
         document.addEventListener('DOMContentLoaded', function () {
-            initializeCharts();
+            initializeChart();
             loadAnalytics();
             setupEventListeners();
         });
 
         // Initialize all charts
-        function initializeCharts() {
-            // Booking Status Chart
-            const statusCtx = document.getElementById('bookingStatusChart').getContext('2d');
-            bookingStatusChart = new Chart(statusCtx, {
-                type: 'doughnut',
+        function initializeChart() {
+            // Bar Chart
+            const barCtx = document.getElementById('userBookingBarChart').getContext('2d');
+            userBookingBarChart = new Chart(barCtx, {
+                type: 'bar',
                 data: {
-                    labels: ['Approved', 'Pending', 'Rejected'],
+                    labels: [],
                     datasets: [{
-                        data: [0, 0, 0],
+                        label: 'Number of Bookings',
+                        data: [],
                         backgroundColor: [
-                            'rgba(40, 167, 69, 0.8)',
-                            'rgba(255, 193, 7, 0.8)',
-                            'rgba(220, 53, 69, 0.8)'
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(240, 147, 251, 0.8)',
+                            'rgba(79, 172, 254, 0.8)',
+                            'rgba(67, 233, 123, 0.8)',
+                            'rgba(250, 112, 154, 0.8)',
+                            'rgba(254, 225, 64, 0.8)',
+                            'rgba(168, 237, 234, 0.8)',
+                            'rgba(254, 214, 227, 0.8)'
                         ],
                         borderColor: [
-                            'rgba(40, 167, 69, 1)',
-                            'rgba(255, 193, 7, 1)',
-                            'rgba(220, 53, 69, 1)'
+                            'rgba(102, 126, 234, 1)',
+                            'rgba(240, 147, 251, 1)',
+                            'rgba(79, 172, 254, 1)',
+                            'rgba(67, 233, 123, 1)',
+                            'rgba(250, 112, 154, 1)',
+                            'rgba(254, 225, 64, 1)',
+                            'rgba(168, 237, 234, 1)',
+                            'rgba(254, 214, 227, 1)'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
+                            borderColor: 'rgba(102, 126, 234, 0.5)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return `Bookings: ${context.parsed.y}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#6c757d',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#6c757d',
+                                font: {
+                                    size: 12
+                                },
+                                maxRotation: 45
+                            }
+                        }
+                    },
+                    elements: {
+                        bar: {
+                            borderRadius: 8
+                        }
+                    }
+                }
+            });
+
+            // Line Chart
+            const lineCtx = document.getElementById('userBookingLineChart').getContext('2d');
+            userBookingLineChart = new Chart(lineCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Number of Bookings',
+                        data: [],
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
+                            borderColor: 'rgba(102, 126, 234, 0.5)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#6c757d',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#6c757d',
+                                font: {
+                                    size: 12
+                                },
+                                maxRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Pie Chart
+            const pieCtx = document.getElementById('userBookingPieChart').getContext('2d');
+            userBookingPieChart = new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(240, 147, 251, 0.8)',
+                            'rgba(79, 172, 254, 0.8)',
+                            'rgba(67, 233, 123, 0.8)',
+                            'rgba(250, 112, 154, 0.8)',
+                            'rgba(254, 225, 64, 0.8)',
+                            'rgba(168, 237, 234, 0.8)',
+                            'rgba(254, 214, 227, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(102, 126, 234, 1)',
+                            'rgba(240, 147, 251, 1)',
+                            'rgba(79, 172, 254, 1)',
+                            'rgba(67, 233, 123, 1)',
+                            'rgba(250, 112, 154, 1)',
+                            'rgba(254, 225, 64, 1)',
+                            'rgba(168, 237, 234, 1)',
+                            'rgba(254, 214, 227, 1)'
                         ],
                         borderWidth: 2
                     }]
@@ -645,100 +720,30 @@
                             position: 'bottom',
                             labels: {
                                 padding: 20,
-                                usePointStyle: true
+                                usePointStyle: true,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
+                            borderColor: 'rgba(102, 126, 234, 0.5)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return `${context.label}: ${context.parsed} bookings (${percentage}%)`;
+                                }
                             }
                         }
                     }
                 }
             });
-
-            // Monthly Trends Chart
-            const trendsCtx = document.getElementById('monthlyTrendsChart').getContext('2d');
-            monthlyTrendsChart = new Chart(trendsCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Bookings',
-                        data: [12, 19, 15, 25, 22, 30],
-                        borderColor: 'rgba(102, 126, 234, 1)',
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Venue Performance Chart
-            const venueCtx = document.getElementById('venuePerformanceChart').getContext('2d');
-            venuePerformanceChart = new Chart(venueCtx, {
-                    type: 'bar',
-                    data: {
-                    labels: ['Conference A', 'Auditorium', 'Meeting B', 'Training C'],
-                        datasets: [{
-                            label: 'Bookings',
-                        data: [45, 38, 25, 18],
-                            backgroundColor: [
-                            'rgba(102, 126, 234, 0.8)',
-                            'rgba(240, 147, 251, 0.8)',
-                            'rgba(79, 172, 254, 0.8)',
-                            'rgba(67, 233, 123, 0.8)'
-                            ],
-                            borderColor: [
-                            'rgba(102, 126, 234, 1)',
-                            'rgba(240, 147, 251, 1)',
-                            'rgba(79, 172, 254, 1)',
-                            'rgba(67, 233, 123, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                    maintainAspectRatio: false,
-                        plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                        }
-                    }
-                });
         }
 
         // Load analytics data
@@ -750,18 +755,21 @@
                 // Show loading state
                 showLoading(true);
 
-                const response = await fetch('/api/analytics');
+                const response = await fetch('/api/admin/bookings');
                 const data = await response.json();
 
                 if (!data.success) {
-                    throw new Error(data.error || 'Failed to load analytics data');
+                    throw new Error(data.message || 'Failed to load analytics data');
                 }
 
-                // Update stats cards
-                updateStatsCards(data);
+                // Process the data
+                const processedData = processBookingData(data.bookings);
 
-                // Update charts
-                updateCharts(data);
+                // Update stats cards
+                updateStatsCards(processedData);
+
+                // Update chart
+                updateChart(processedData);
 
                 // Hide loading state
                 showLoading(false);
@@ -779,35 +787,79 @@
             }
         }
 
+        // Process booking data to get user statistics
+        function processBookingData(bookings) {
+            const userStats = {};
+            const statusCounts = { PENDING: 0, CONFIRMED: 0, REJECTED: 0, CANCELLED: 0 };
+
+            bookings.forEach(booking => {
+                // Count by status
+                const status = booking.status || 'PENDING';
+                statusCounts[status] = (statusCounts[status] || 0) + 1;
+
+                // Count by user
+                if (booking.user && booking.user.email) {
+                    const userEmail = booking.user.email;
+                    if (!userStats[userEmail]) {
+                        userStats[userEmail] = 0;
+                    }
+                    userStats[userEmail]++;
+                }
+            });
+
+            return {
+                userStats,
+                statusCounts,
+                totalBookings: bookings.length,
+                uniqueUsers: Object.keys(userStats).length
+            };
+        }
+
         // Update stats cards
         function updateStatsCards(data) {
-            const statusCounts = data.statusCounts || { APPROVED: 0, REJECTED: 0, PENDING: 0 };
-
-            document.getElementById('totalBookings').textContent =
-                statusCounts.APPROVED + statusCounts.REJECTED + statusCounts.PENDING;
-            document.getElementById('pendingBookings').textContent = statusCounts.PENDING || 0;
-            document.getElementById('rejectedBookings').textContent = statusCounts.REJECTED || 0;
-            document.getElementById('totalVenues').textContent = data.totalVenues || 0;
+            document.getElementById('totalBookings').textContent = data.totalBookings;
+            document.getElementById('pendingBookings').textContent = data.statusCounts.PENDING || 0;
+            document.getElementById('rejectedBookings').textContent = data.statusCounts.REJECTED || 0;
+            document.getElementById('activeUsers').textContent = data.uniqueUsers;
         }
 
-        // Update charts
-        function updateCharts(data) {
-            const statusCounts = data.statusCounts || { APPROVED: 0, REJECTED: 0, PENDING: 0 };
+        // Update all charts
+        function updateChart(data) {
+            const users = Object.keys(data.userStats);
+            const bookingCounts = Object.values(data.userStats);
 
-            // Update booking status chart
-            bookingStatusChart.data.datasets[0].data = [
-                statusCounts.APPROVED || 0,
-                statusCounts.PENDING || 0,
-                statusCounts.REJECTED || 0
-            ];
-            bookingStatusChart.update();
+            // Sort by booking count (descending)
+            const sortedData = users.map((user, index) => ({
+                user: user,
+                count: bookingCounts[index]
+            })).sort((a, b) => b.count - a.count);
+
+            // Take top 10 users for better visualization
+            const topUsers = sortedData.slice(0, 10);
+            const labels = topUsers.map(item => {
+                // Truncate email for better display
+                const email = item.user;
+                return email.length > 20 ? email.substring(0, 20) + '...' : email;
+            });
+            const dataValues = topUsers.map(item => item.count);
+
+            // Update Bar Chart
+            userBookingBarChart.data.labels = labels;
+            userBookingBarChart.data.datasets[0].data = dataValues;
+            userBookingBarChart.update();
+
+            // Update Line Chart
+            userBookingLineChart.data.labels = labels;
+            userBookingLineChart.data.datasets[0].data = dataValues;
+            userBookingLineChart.update();
+
+            // Update Pie Chart
+            userBookingPieChart.data.labels = labels;
+            userBookingPieChart.data.datasets[0].data = dataValues;
+            userBookingPieChart.update();
         }
 
-        // Change chart type
-        function changeChartType(type) {
-            bookingStatusChart.config.type = type;
-            bookingStatusChart.update();
-        }
+
 
         // Setup event listeners
         function setupEventListeners() {
@@ -865,7 +917,7 @@
         }, observerOptions);
 
         // Observe all cards for animation
-        document.querySelectorAll('.stats-card, .chart-card, .activity-card').forEach(card => {
+        document.querySelectorAll('.stats-card, .chart-card').forEach(card => {
             card.style.opacity = '0';
             card.style.transform = 'translateY(30px)';
             card.style.transition = 'all 0.6s ease-out';

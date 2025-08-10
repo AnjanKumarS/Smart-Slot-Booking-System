@@ -903,7 +903,7 @@
                 const data = await response.json();
 
                 if (data.success && data.redirectUrl) {
-                    showSuccess('Booking submitted successfully! Redirecting...');
+                    showSuccess('Booking submitted successfully! Wait for ADMIN to approve your booking');
                     setTimeout(() => {
                         window.location.href = data.redirectUrl;
                     }, 1500);

@@ -2,378 +2,327 @@ package com.smartslot.controller;
 
 import com.smartslot.model.User;
 import com.smartslot.model.Venue;
-import com.smartslot.service.AuthService;
 import com.smartslot.service.VenueService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@RestController
-@RequestMapping("/api/venues")
-@CrossOrigin(origins = "*")
+@Controller
 public class VenueController {
     
     @Autowired
     private VenueService venueService;
     
-    @Autowired
-    private AuthService authService;
-    
-    /**
-     * Test endpoint with hardcoded venue data
-     */
-    @GetMapping("/test")
-    public ResponseEntity<Map<String, Object>> getTestVenues() {
-        Map<String, Object> response = new HashMap<>();
-        
-        try {
-            System.out.println("=== VenueController: Getting test venues ===");
-            
-            List<Map<String, Object>> testVenues = new ArrayList<>();
-            
-            Map<String, Object> venue1 = new HashMap<>();
-            venue1.put("id", 1L);
-            venue1.put("name", "CS Auditorium");
-            venue1.put("description", "Computer Science Department's main auditorium");
-            venue1.put("capacity", 300);
-            venue1.put("location", "CS Building, Ground Floor");
-            venue1.put("hourly_rate", 120.00);
-            venue1.put("image_url", "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=200&fit=crop");
-            venue1.put("is_active", true);
-            venue1.put("amenities", Arrays.asList("4K Projector", "Sound System", "Air Conditioning"));
-            testVenues.add(venue1);
-            
-            Map<String, Object> venue2 = new HashMap<>();
-            venue2.put("id", 2L);
-            venue2.put("name", "ISE Seminar Hall");
-            venue2.put("description", "Information Science Engineering seminar hall");
-            venue2.put("capacity", 150);
-            venue2.put("location", "ISE Building, 1st Floor");
-            venue2.put("hourly_rate", 100.00);
-            venue2.put("image_url", "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=200&fit=crop");
-            venue2.put("is_active", true);
-            venue2.put("amenities", Arrays.asList("HD Projector", "Sound System", "Air Conditioning"));
-            testVenues.add(venue2);
-            
-            response.put("success", true);
-            response.put("venues", testVenues);
-            System.out.println("VenueController: Returning test venues successfully");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            System.err.println("=== VenueController: ERROR getting test venues ===");
-            System.err.println("VenueController: Error message: " + e.getMessage());
-            e.printStackTrace();
-            response.put("success", false);
-            response.put("error", "Failed to get test venues: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(response);
+    // Admin venue management page
+    @GetMapping("/admin/venues")
+    public String adminVenues(HttpSession session) {
+        if (!isAdmin(session)) {
+            return "redirect:/login";
         }
+        return "admin-venues";
     }
-    
-    /**
-     * Get all venues
-     * @return ResponseEntity with venues
-     */
-    @GetMapping
-    public ResponseEntity<Map<String, Object>> getAllVenues() {
-        Map<String, Object> response = new HashMap<>();
-        
-        try {
-            System.out.println("=== VenueController: Getting all venues ===");
-            System.out.println("VenueController: Calling venueService.getVenuesWithDemoData()...");
-            
-            List<Venue> venues = venueService.getVenuesWithDemoData();
-            System.out.println("VenueController: Found " + venues.size() + " venues");
-            
-            // Convert to simple DTOs to avoid serialization issues
-            List<Map<String, Object>> venueDtos = new ArrayList<>();
-            for (Venue venue : venues) {
-                Map<String, Object> venueDto = new HashMap<>();
-                venueDto.put("id", venue.getId());
-                venueDto.put("name", venue.getName());
-                venueDto.put("description", venue.getDescription());
-                venueDto.put("capacity", venue.getCapacity());
-                venueDto.put("location", venue.getLocation());
-                venueDto.put("hourly_rate", venue.getHourlyRate());
-                venueDto.put("image_url", venue.getImageUrl());
-                venueDto.put("is_active", venue.getIsActive());
-                venueDto.put("amenities", venue.getAmenities() != null ? venue.getAmenities() : new ArrayList<>());
-                venueDtos.add(venueDto);
-            }
-            
-            // Debug each venue
-            for (int i = 0; i < venues.size(); i++) {
-                Venue venue = venues.get(i);
-                System.out.println("Venue " + (i+1) + ": ID=" + venue.getId() + ", Name=" + venue.getName() + ", Active=" + venue.getIsActive());
-            }
-            
-            response.put("success", true);
-            response.put("venues", venueDtos);
-            System.out.println("VenueController: Returning response with " + venues.size() + " venues");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            System.err.println("=== VenueController: ERROR getting venues ===");
-            System.err.println("VenueController: Error message: " + e.getMessage());
-            e.printStackTrace();
-            response.put("success", false);
-            response.put("error", "Failed to get venues: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(response);
+
+    // Get all venues for admin
+    @GetMapping("/api/admin/venues")
+    @ResponseBody
+    public ResponseEntity<?> getAllVenues(HttpSession session) {
+        if (!isAdmin(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "Unauthorized"));
         }
+        List<Venue> venues = venueService.getAllVenues();
+        return ResponseEntity.ok(Map.of("success", true, "venues", venues));
     }
-    
-    /**
-     * Get venue by ID
-     * @param id Venue ID
-     * @return ResponseEntity with venue details
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> getVenueById(@PathVariable Long id) {
-        Map<String, Object> response = new HashMap<>();
-        
+
+    // Get all active venues for public users (dashboard)
+    @GetMapping("/api/venues")
+    @ResponseBody
+    public ResponseEntity<?> getPublicVenues() {
+        List<Venue> venues = venueService.getActiveVenues();
+        return ResponseEntity.ok(Map.of("success", true, "venues", venues));
+    }
+
+    // Get venue by ID
+    @GetMapping("/api/admin/venues/{id}")
+    @ResponseBody
+    public ResponseEntity<?> getVenueById(@PathVariable Long id, HttpSession session) {
+        if (!isAdmin(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "Unauthorized"));
+        }
         Optional<Venue> venue = venueService.getVenueById(id);
-        if (venue.isEmpty()) {
-            response.put("success", false);
-            response.put("error", "Venue not found");
-            return ResponseEntity.notFound().build();
+        if (venue.isPresent()) {
+            return ResponseEntity.ok(Map.of("success", true, "venue", venue.get()));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("success", false, "message", "Venue not found"));
         }
-        
-        response.put("success", true);
-        response.put("venue", venue.get());
-        return ResponseEntity.ok(response);
     }
-    
-    /**
-     * Create new venue (Admin only)
-     * @param venue Venue to create
-     * @param token Authorization token
-     * @return ResponseEntity with creation result
-     */
-    @PostMapping
-    public ResponseEntity<Map<String, Object>> createVenue(@RequestBody Venue venue, 
-                                                           @RequestHeader(value = "Authorization", required = false) String token) {
+
+    // Create new venue
+    @PostMapping("/api/admin/venues")
+    @ResponseBody
+    public ResponseEntity<?> createVenue(@RequestBody Venue venue, HttpSession session) {
+        if (!isAdmin(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "Unauthorized"));
+        }
+
         Map<String, Object> response = new HashMap<>();
         
-        // Validate admin access
-        User user = authService.validateToken(token);
-        if (user == null || !authService.hasRole(user, User.UserRole.ADMIN)) {
+        // Validation
+        if (venue.getName() == null || venue.getName().trim().isEmpty()) {
             response.put("success", false);
-            response.put("error", "Admin access required");
-            return ResponseEntity.status(403).body(response);
+            response.put("message", "Venue name is required");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        if (venue.getCapacity() == null || venue.getCapacity() <= 0) {
+            response.put("success", false);
+            response.put("message", "Valid capacity is required");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        if (venue.getLocation() == null || venue.getLocation().trim().isEmpty()) {
+            response.put("success", false);
+            response.put("message", "Venue location is required");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        // For college venues, hourly rate should be 0 (free)
+        if (venue.getHourlyRate() == null) {
+            venue.setHourlyRate(BigDecimal.ZERO);
+        }
+
+        // Check if venue name already exists
+        if (venueService.venueNameExists(venue.getName())) {
+            response.put("success", false);
+            response.put("message", "Venue name already exists");
+            return ResponseEntity.badRequest().body(response);
         }
         
         try {
             Venue createdVenue = venueService.createVenue(venue);
             response.put("success", true);
-            response.put("venue", createdVenue);
             response.put("message", "Venue created successfully");
+            response.put("venue", createdVenue);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.put("success", false);
-            response.put("error", "Failed to create venue: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(response);
+            response.put("message", "Failed to create venue: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-    
-    /**
-     * Update venue (Admin only)
-     * @param id Venue ID
-     * @param venueDetails Updated venue details
-     * @param token Authorization token
-     * @return ResponseEntity with update result
-     */
-    @PutMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> updateVenue(@PathVariable Long id, 
-                                                           @RequestBody Venue venueDetails,
-                                                           @RequestHeader(value = "Authorization", required = false) String token) {
+
+    // Update venue
+    @PutMapping("/api/admin/venues/{id}")
+    @ResponseBody
+    public ResponseEntity<?> updateVenue(@PathVariable Long id, @RequestBody Venue venueDetails, HttpSession session) {
+        if (!isAdmin(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "Unauthorized"));
+        }
+
         Map<String, Object> response = new HashMap<>();
         
-        // Validate admin access
-        User user = authService.validateToken(token);
-        if (user == null || !authService.hasRole(user, User.UserRole.ADMIN)) {
+        // Validation
+        if (venueDetails.getName() == null || venueDetails.getName().trim().isEmpty()) {
             response.put("success", false);
-            response.put("error", "Admin access required");
-            return ResponseEntity.status(403).body(response);
+            response.put("message", "Venue name is required");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        if (venueDetails.getCapacity() == null || venueDetails.getCapacity() <= 0) {
+            response.put("success", false);
+            response.put("message", "Valid capacity is required");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        if (venueDetails.getLocation() == null || venueDetails.getLocation().trim().isEmpty()) {
+            response.put("success", false);
+            response.put("message", "Venue location is required");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        // For college venues, hourly rate should be 0 (free)
+        if (venueDetails.getHourlyRate() == null) {
+            venueDetails.setHourlyRate(BigDecimal.ZERO);
+        }
+
+        // Check if venue exists
+        if (!venueService.venueExists(id)) {
+            response.put("success", false);
+            response.put("message", "Venue not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        // Check if venue name already exists (excluding current venue)
+        if (venueService.venueNameExistsExcludingCurrent(venueDetails.getName(), id)) {
+            response.put("success", false);
+            response.put("message", "Venue name already exists");
+            return ResponseEntity.badRequest().body(response);
         }
         
         try {
             Venue updatedVenue = venueService.updateVenue(id, venueDetails);
-            if (updatedVenue == null) {
+            if (updatedVenue != null) {
+                response.put("success", true);
+                response.put("message", "Venue updated successfully");
+                response.put("venue", updatedVenue);
+                return ResponseEntity.ok(response);
+            } else {
                 response.put("success", false);
-                response.put("error", "Venue not found");
-                return ResponseEntity.notFound().build();
+                response.put("message", "Failed to update venue");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
             }
-            
-            response.put("success", true);
-            response.put("venue", updatedVenue);
-            response.put("message", "Venue updated successfully");
-            return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.put("success", false);
-            response.put("error", "Failed to update venue: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(response);
+            response.put("message", "Failed to update venue: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-    
-    /**
-     * Delete venue (Admin only)
-     * @param id Venue ID
-     * @param token Authorization token
-     * @return ResponseEntity with deletion result
-     */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> deleteVenue(@PathVariable Long id,
-                                                           @RequestHeader(value = "Authorization", required = false) String token) {
+
+    // Delete venue (soft delete)
+    @DeleteMapping("/api/admin/venues/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteVenue(@PathVariable Long id, HttpSession session) {
+        if (!isAdmin(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "Unauthorized"));
+        }
+
         Map<String, Object> response = new HashMap<>();
         
-        // Validate admin access
-        User user = authService.validateToken(token);
-        if (user == null || !authService.hasRole(user, User.UserRole.ADMIN)) {
+        if (!venueService.venueExists(id)) {
             response.put("success", false);
-            response.put("error", "Admin access required");
-            return ResponseEntity.status(403).body(response);
+            response.put("message", "Venue not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
         
         try {
             boolean deleted = venueService.deleteVenue(id);
-            if (!deleted) {
+            if (deleted) {
+                response.put("success", true);
+                response.put("message", "Venue deleted successfully");
+                return ResponseEntity.ok(response);
+            } else {
                 response.put("success", false);
-                response.put("error", "Venue not found");
-                return ResponseEntity.notFound().build();
+                response.put("message", "Failed to delete venue");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
             }
-            
-            response.put("success", true);
-            response.put("message", "Venue deleted successfully");
-            return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.put("success", false);
-            response.put("error", "Failed to delete venue: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(response);
+            response.put("message", "Failed to delete venue: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-    
-    /**
-     * Search venues by name
-     * @param name Search term
-     * @return ResponseEntity with search results
-     */
-    @GetMapping("/search")
-    public ResponseEntity<List<Venue>> searchVenues(@RequestParam String name) {
-        List<Venue> venues = venueService.searchVenuesByName(name);
-        return ResponseEntity.ok(venues);
-    }
-    
-    /**
-     * Filter venues by capacity
-     * @param minCapacity Minimum capacity
-     * @return ResponseEntity with filtered venues
-     */
-    @GetMapping("/filter/capacity")
-    public ResponseEntity<List<Venue>> filterByCapacity(@RequestParam Integer minCapacity) {
-        List<Venue> venues = venueService.getVenuesByMinCapacity(minCapacity);
-        return ResponseEntity.ok(venues);
-    }
-    
-    /**
-     * Filter venues by location
-     * @param location Location search term
-     * @return ResponseEntity with filtered venues
-     */
-    @GetMapping("/filter/location")
-    public ResponseEntity<List<Venue>> filterByLocation(@RequestParam String location) {
-        List<Venue> venues = venueService.getVenuesByLocation(location);
-        return ResponseEntity.ok(venues);
-    }
-    
-    /**
-     * Filter venues by price range
-     * @param minRate Minimum hourly rate
-     * @param maxRate Maximum hourly rate
-     * @return ResponseEntity with filtered venues
-     */
-    @GetMapping("/filter/price")
-    public ResponseEntity<List<Venue>> filterByPrice(@RequestParam BigDecimal minRate, 
-                                                     @RequestParam BigDecimal maxRate) {
-        List<Venue> venues = venueService.getVenuesByPriceRange(minRate, maxRate);
-        return ResponseEntity.ok(venues);
-    }
-    
-    /**
-     * Get venue statistics (Admin only)
-     * @param token Authorization token
-     * @return ResponseEntity with venue statistics
-     */
-    @GetMapping("/statistics")
-    public ResponseEntity<Map<String, Object>> getVenueStatistics(@RequestHeader(value = "Authorization", required = false) String token) {
-        Map<String, Object> response = new HashMap<>();
-        
-        // Validate admin access
-        User user = authService.validateToken(token);
-        if (user == null || !authService.hasRole(user, User.UserRole.ADMIN)) {
-            response.put("success", false);
-            response.put("error", "Admin access required");
-            return ResponseEntity.status(403).body(response);
+
+    // Hard delete venue
+    @DeleteMapping("/api/admin/venues/{id}/hard")
+    @ResponseBody
+    public ResponseEntity<?> hardDeleteVenue(@PathVariable Long id, HttpSession session) {
+        if (!isAdmin(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "Unauthorized"));
         }
-        
-        Map<String, Object> statistics = venueService.getVenueStatistics();
-        return ResponseEntity.ok(statistics);
-    }
-    
-    /**
-     * Reset and recreate all demo venues (Admin only)
-     * @param token Authorization token
-     * @return ResponseEntity with reset result
-     */
-    @PostMapping("/reset-demo")
-    public ResponseEntity<Map<String, Object>> resetDemoVenues(@RequestHeader(value = "Authorization", required = false) String token) {
+
         Map<String, Object> response = new HashMap<>();
         
-        // Validate admin access
-        User user = authService.validateToken(token);
-        if (user == null || !authService.hasRole(user, User.UserRole.ADMIN)) {
+        if (!venueService.venueExists(id)) {
             response.put("success", false);
-            response.put("error", "Admin access required");
-            return ResponseEntity.status(403).body(response);
+            response.put("message", "Venue not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
         
         try {
-            List<Venue> venues = venueService.resetAndCreateDemoVenues();
+            boolean deleted = venueService.hardDeleteVenue(id);
+            if (deleted) {
             response.put("success", true);
-            response.put("message", "Successfully reset and created " + venues.size() + " demo venues");
-            response.put("venues", venues);
+                response.put("message", "Venue permanently deleted");
             return ResponseEntity.ok(response);
+            } else {
+                response.put("success", false);
+                response.put("message", "Failed to delete venue");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            }
         } catch (Exception e) {
             response.put("success", false);
-            response.put("error", "Failed to reset demo venues: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(response);
+            response.put("message", "Failed to delete venue: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-    
-    /**
-     * Reset and recreate all demo venues (Public endpoint for testing)
-     * @return ResponseEntity with reset result
-     */
-    @PostMapping("/reset-demo-public")
-    public ResponseEntity<Map<String, Object>> resetDemoVenuesPublic() {
-        Map<String, Object> response = new HashMap<>();
-        
-        try {
-            List<Venue> venues = venueService.resetAndCreateDemoVenues();
-            response.put("success", true);
-            response.put("message", "Successfully reset and created " + venues.size() + " demo venues");
-            response.put("venues", venues);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("success", false);
-            response.put("error", "Failed to reset demo venues: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(response);
+
+    // Search venues
+    @GetMapping("/api/admin/venues/search")
+    @ResponseBody
+    public ResponseEntity<?> searchVenues(@RequestParam(required = false) String name,
+                                        @RequestParam(required = false) String location,
+                                        @RequestParam(required = false) Integer minCapacity,
+                                        @RequestParam(required = false) Integer maxCapacity,
+                                        @RequestParam(required = false) BigDecimal minRate,
+                                        @RequestParam(required = false) BigDecimal maxRate,
+                                        HttpSession session) {
+        if (!isAdmin(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "Unauthorized"));
         }
+
+        List<Venue> venues;
+
+        if (name != null && !name.trim().isEmpty()) {
+            venues = venueService.searchVenuesByName(name);
+        } else if (location != null && !location.trim().isEmpty()) {
+            venues = venueService.searchVenuesByLocation(location);
+        } else if (minCapacity != null && maxCapacity != null) {
+            venues = venueService.getVenuesByCapacityRange(minCapacity, maxCapacity);
+        } else if (minRate != null && maxRate != null) {
+            venues = venueService.getVenuesByPriceRange(minRate, maxRate);
+        } else if (minCapacity != null) {
+            venues = venueService.getVenuesByMinCapacity(minCapacity);
+        } else {
+            venues = venueService.getAllVenues();
+        }
+
+        return ResponseEntity.ok(Map.of("success", true, "venues", venues));
+    }
+
+    // Get venue statistics
+    @GetMapping("/api/admin/venues/stats")
+    @ResponseBody
+    public ResponseEntity<?> getVenueStats(HttpSession session) {
+        if (!isAdmin(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "Unauthorized"));
+        }
+
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("totalVenues", venueService.getAllVenues().size());
+        stats.put("activeVenues", venueService.getActiveVenueCount());
+        stats.put("inactiveVenues", venueService.getAllVenues().size() - venueService.getActiveVenueCount());
+
+        return ResponseEntity.ok(Map.of("success", true, "stats", stats));
+    }
+
+    // Fix existing venues (set hourly rate to 0 and is_active to true)
+    @PostMapping("/api/admin/venues/fix")
+    @ResponseBody
+    public ResponseEntity<?> fixExistingVenues(HttpSession session) {
+        if (!isAdmin(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "Unauthorized"));
+        }
+
+        try {
+            venueService.fixExistingVenues();
+            return ResponseEntity.ok(Map.of("success", true, "message", "Venues fixed successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("success", false, "message", "Failed to fix venues: " + e.getMessage()));
+        }
+    }
+
+    private boolean isAdmin(HttpSession session) {
+        String role = (String) session.getAttribute("role");
+        return "ADMIN".equals(role);
     }
 }
 

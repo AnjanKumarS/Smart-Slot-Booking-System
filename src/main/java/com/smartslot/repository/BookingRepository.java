@@ -88,5 +88,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
            "WHERE b.status = 'CONFIRMED' " +
            "GROUP BY EXTRACT(HOUR FROM b.startTime) ORDER BY bookingCount DESC")
     List<Object[]> findPeakHours();
+
+    @Query("SELECT b FROM Booking b JOIN FETCH b.user JOIN FETCH b.venue")
+    List<Booking> findAllWithUserAndVenue();
 }
 

@@ -37,6 +37,13 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         
+        // Skip authentication for admin login endpoint
+        if (request.getRequestURI().equals("/admin/login") && request.getMethod().equals("POST")) {
+            System.out.println("Skipping authentication for admin login endpoint");
+            filterChain.doFilter(request, response);
+            return;
+        }
+        
         // Check if user is already authenticated in Spring Security context
         if (SecurityContextHolder.getContext().getAuthentication() != null && 
             SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {

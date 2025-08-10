@@ -36,12 +36,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         if (developmentMode) {
             // Development mode: Allow public access to most endpoints
             http.authorizeRequests()
+                .antMatchers("/admin/login").permitAll() // Allow admin login first
                 .antMatchers(
-                    "/", "/login", "/register", "/api/**", "/dashboard", "/test-auth", "/test-venues", "/health", "/booking", "/book", "/logout", "/verify-booking", "/user/bookings",
+                    "/", "/login", "/register", "/admin-login", "/api/venues", "/dashboard", "/test-auth", "/test-venues", "/health", "/booking", "/book", "/logout", "/verify-booking", "/user/bookings",
                     "/css/**", "/js/**", "/static/**", "/webjars/**", "/favicon.ico", "/images/**"
                 ).permitAll()
                 .antMatchers("/user/bookings", "/chatbot", "/user-dashboard", 
-                           "/admin-dashboard", "/staff-dashboard", "/admin/**").authenticated()
+                           "/admin-dashboard", "/staff-dashboard", "/admin/panel", "/api/admin/**").authenticated()
                 .anyRequest().permitAll()
                 .and()
                 .formLogin().disable()
@@ -50,12 +51,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         } else {
             // Production mode: Strict authentication
             http.authorizeRequests()
+                .antMatchers("/admin/login").permitAll() // Allow admin login first
                 .antMatchers(
-                    "/login", "/register", "/api/auth/**", "/logout", "/verify-booking", "/health",
+                    "/login", "/register", "/admin-login", "/api/auth/**", "/api/venues", "/logout", "/verify-booking", "/health",
                     "/css/**", "/js/**", "/static/**", "/webjars/**", "/favicon.ico", "/images/**"
                 ).permitAll()
                 .antMatchers("/", "/dashboard", "/booking", "/book", "/user/bookings", "/chatbot", "/user-dashboard", 
-                           "/admin-dashboard", "/staff-dashboard", "/admin/**").authenticated()
+                           "/admin-dashboard", "/staff-dashboard", "/admin/panel", "/api/admin/**").authenticated()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin().disable()

@@ -162,6 +162,14 @@ public class HomeController {
     }
     
     /**
+     * Serve the admin login page
+     */
+    @GetMapping("/admin-login")
+    public String adminLogin() {
+        return "admin-login";
+    }
+
+    /**
      * Serve the login page
      */
     @GetMapping("/login")
